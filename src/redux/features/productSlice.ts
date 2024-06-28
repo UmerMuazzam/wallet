@@ -1,3 +1,4 @@
+import { IProduct } from "@/app/admin/dashboard/page"
 import { PayloadAction, createSlice } from "@reduxjs/toolkit"
 
 const initialState : IProduct={

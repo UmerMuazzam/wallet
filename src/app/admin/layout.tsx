@@ -19,7 +19,7 @@ const layout = ({ children }: { children: React.ReactNode }) => {
       <Sidebar/> 
       <div className="w-full h-full">
         {/* <Navabr/> */}
-        <div className="bg-gray-200 p-4 h-[calc(100vh-64px)]">{children}</div>
+        <div className="  p-4 h-[calc(100vh-64px)]">{children}</div>
       </div>
       {isLoading && <Loader/>}
     </div>
