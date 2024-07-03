@@ -1,30 +1,47 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
- 
 
-th,td{
-    border-bottom: 1px solid #ececec;
-    padding: 8px;
-    text-align: left;
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+.h-container {
 }
 
-.loader {
-    width: 48px;
-    height: 48px;
-    border: 5px solid #FFF;
-    border-bottom-color: transparent;
-    border-radius: 50%;
-    display: inline-block;
-    box-sizing: border-box;
-    animation: rotation 1s linear infinite;
-    }
+.buttons {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+}
 
-    @keyframes rotation {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
-    } 
+.createAcc {
+}
+
+h1 {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+h3 {
+  ont-size: 1.3rem;
+  font-weight: bold;
+  margin: 1rem 0;
+}
+h4 {
+}
+
+button {
+  border-radius: 5px;
+  border: 1px solid #08adff;
+  padding: 8px 30px;
+  margin: 1rem 0;
+}
+input {
+  border-radius: 5px;
+  border: 1px solid #ececec;
+  padding: 10px;
+  margin: 10px;
+  width: 30%;
+}
