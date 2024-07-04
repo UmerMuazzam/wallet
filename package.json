@@ -10,15 +10,20 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.2.5",
+    "aes-js": "^3.1.2",
     "axios": "^1.7.2",
+    "bip32": "^2.0.6",
+    "bip39": "^3.1.0",
     "mongoose": "^8.4.4",
     "next": "14.2.4",
     "next-auth": "^4.24.7",
+    "pbkdf2": "^3.1.2",
     "react": "^18",
     "react-dom": "^18",
     "react-hot-toast": "^2.4.1",
     "react-icons": "^5.2.1",
-    "react-redux": "^9.1.2"
+    "react-redux": "^9.1.2",
+    "web3": "^4.10.0"
   },
   "devDependencies": {
     "@types/node": "^20",
