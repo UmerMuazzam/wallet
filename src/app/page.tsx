@@ -16,10 +16,10 @@ const page = () => {
 
   // console.log(ballance, "    ", address);
 
-  const handleDashboard = async () => {
+  const handleNext = async () => {
     const data = await createAccount(mnemonics);
     setBallance(data.ballance);
-    setAddress(data.address); 
+    setAddress(data.address);
     encryptMnemonics(password, JSON.stringify(mnemonics));
     router.push(`/home?address=${data.address}&ballance=${data.ballance}`);
   };
@@ -38,8 +38,7 @@ const page = () => {
     setRestoreAcc(false);
   };
   const restoreAccount = () => {
-    setRestoreAcc(true);
-    setCreateAcc(false);
+     router.push('/restore');
   };
   return (
     <div className="container">
@@ -81,33 +80,11 @@ const page = () => {
             AGAIN{" "}
           </h3>
           {mnemonics} <br />
-          <button className="create" onClick={handleDashboard}>
+          <button className="create" onClick={handleNext}>
             Next
           </button>
         </div>
       )}
-
-      {/* restore account  */} 
-      
-      {!mnemonics && restoreAcc && (
-        <div className="createAcc">
-          <h3>Restore wallet</h3>
-          <h4>Enter new password</h4>
-          <br />
-          <div style={{ fontSize: "13px", color: "lightgreen" }}>
-            Password must be at least of 8 character
-          </div>
-          <input
-            type="text"
-            placeholder="new password"
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <span className="create">Restore</span>
-        </div>
-      )}
-
-     
-
 
     </div>
   );
