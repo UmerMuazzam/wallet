@@ -3,10 +3,10 @@
 import React from "react";
 
 const page = () => {
-
-    const handleForm=(formData) => {
-        console.log(formData.get('mnemonics'))
-    }
+  const handleForm = (formData) => {
+    console.log(formData.get("mnemonics"));
+    console.log(formData.get("password"));
+  };
 
   return (
     <div className="container">
@@ -28,7 +28,13 @@ const page = () => {
           name="mnemonics"
         />
         <h3>Please enter password</h3>
-        <input type="text" placeholder="Enter new password" required  id="password" name="password"/>
+        <input
+          type="text"
+          placeholder="Enter new password"
+          required
+          id="password"
+          name="password"
+        />
         <button type="submit">Submit</button>
       </form>
     </div>
