@@ -23,7 +23,6 @@ export const encryptMnemonics = async (pass, mnemo) => {
     "sha512",
     (err, derivedKey) => {
       if (err) throw err;
-      console.log("derived key : ", derivedKey.toString("hex")); // '3745e48...08d59ae'
       // encryption
       const textBytes = aes.utils.utf8.toBytes(mnemo);
       const aesCtr = new aes.ModeOfOperation.ctr(
@@ -40,8 +39,12 @@ export const encryptMnemonics = async (pass, mnemo) => {
 };
 
 //  function to decrypt mnemonics
-export const decryptMnemonics = async (pass, setWrongPass, setNavigate) => {
-  const mnemmonics = localStorage.getItem("mnemmonics");
+export const decryptMnemonics = async (
+  pass,
+  mnemmonics,
+  setWrongPass,
+  setNavigate
+) => {
   console.log("password : ", pass, "encypted mnemonics : ", mnemmonics);
   // key generation
   pbkdf2(
@@ -52,7 +55,6 @@ export const decryptMnemonics = async (pass, setWrongPass, setNavigate) => {
     "sha512",
     async (err, derivedKey) => {
       if (err) throw err;
-      console.log("derived key : ", derivedKey.toString("hex")); // '3745e48...08d59ae'
       // decryptMnemonics
 
       try {
@@ -63,8 +65,12 @@ export const decryptMnemonics = async (pass, setWrongPass, setNavigate) => {
         );
         const decryptedBytes = aesCtr.decrypt(encryptedBytes);
         const decryptedText = aes.utils.utf8.fromBytes(decryptedBytes);
-        console.log("decryptedText", decryptedText);
-        JSON.parse(decryptedText);
+        const regex = /^[A-Za-z]+(?:\s[A-Za-z]+)*$/;
+        if (!regex.test(decryptedText)) {
+          throw new Error();
+        }
+        // JSON.parse(decryptedText);
+        console.log("decrypted mnemonics : ", decryptedText);
         setWrongPass(false);
         setNavigate(true);
       } catch (error) {
@@ -77,13 +83,13 @@ export const decryptMnemonics = async (pass, setWrongPass, setNavigate) => {
 
 export const createAccount = async (mns) => {
   const seed = await bip39.mnemonicToSeed(mns);
+
   const node = bip32.fromSeed(seed);
   const child = node.derivePath("m/44'/60'/0'/0/0");
   const privateKey = child.privateKey.toString("hex");
   const account = await web3.eth.accounts.wallet.add(`0x${privateKey}`);
   const address = account[0].address;
   localStorage.setItem("address", address);
-  // const ballance = await web3.eth.getBalance(account[0].address)
   const ballance = Web3.utils.fromWei(
     await web3.eth.getBalance(account[0].address),
     "ether"
@@ -97,7 +103,6 @@ export const getDetails = async () => {
     await web3.eth.getBalance(address),
     "ether"
   );
-  // console.log("address", address, "ballance", ballance)
 
   return { address, ballance };
 };

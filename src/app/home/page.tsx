@@ -1,29 +1,29 @@
-"use client"
+"use client";
 
 import { decryptMnemonics } from "@/utils/generateMnemonics";
 import { useSearchParams } from "next/navigation";
-import  { useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 const page = () => {
-     const router = useRouter();
-   const [password, setPassword] = useState("");
-   const [wrongPass, setWrongPass] = useState(false);
-   const [navigate, setNavigate] = useState(false);
-   console.log(wrongPass)
-   const searchParams = useSearchParams();
-    
-   const handleDecryption= async()=>{ 
-     console.log("handleDecryption");
-    if(password.length < 8) return
-     await decryptMnemonics(password, setWrongPass, setNavigate);
-      
-     if (navigate) {
-       console.log("navigate to dashboard");
-       router.push(`/dashboard`);
-     }
-   }
-    
+  const router = useRouter();
+  const [password, setPassword] = useState("");
+  const [wrongPass, setWrongPass] = useState(false);
+  const [navigate, setNavigate] = useState(false);
+
+  const searchParams = useSearchParams();
+
+  const handleDecryption = async () => {
+    const mnemmonics = localStorage.getItem("mnemmonics");
+
+    if (password.length < 8) return;
+    await decryptMnemonics(password, mnemmonics, setWrongPass, setNavigate);
+
+    if (navigate) {
+      router.push(`/dashboard`);
+    }
+  };
+
   return (
     <div className="container">
       <div className="createAcc">
