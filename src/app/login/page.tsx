@@ -1,15 +1,31 @@
 "use client";
 
 import Logo from "@/components/Logo";
-import { useRouter } from "next/navigation";
+import { decryptMnemonics } from "@/utils/walletUtilities";
+import { useRouter, useSearchParams } from "next/navigation";
 import React, { useState } from "react";
+
 
 const page = () => {
   const [password, setPassword] = useState("");
-  const router = useRouter();
-
-  const handleDashboard = () => {
-    router.push("/dashboard");
+  const [checkPass, setCheckPass] = useState(false); 
+  const router = useRouter();  
+  const mnemonics = localStorage.getItem("mnemmonics");
+  
+  const handleDashboard = async () => {
+    try {
+      const res = await decryptMnemonics(
+        password,
+        mnemonics,
+        router,
+        setCheckPass,
+        "/dashboard"
+      );
+      
+    } catch (error) {
+      console.log(error,"something went wrong");
+      setCheckPass(true);
+    }
   };
 
   return (
@@ -22,19 +38,25 @@ const page = () => {
           <b>Wellcome Back:</b> Unlock your wallet account by providing password
         </h3>
 
-        <input
-          type="text"
-          placeholder="Enter password"
-          onChange={(e) => setPassword(e.target.value)}
-          className="py-2 bg-slate-100 rounded w-96 text-black outline-none"
-        />
-        <span
-          className="py-[10px] cursor-pointer  px-6 bg-slate-400 rounded w-96 text-white hover:bg-white hover:text-black border"
-          onClick={handleDashboard}
-        >
-          Unlock
-        </span>
+        <div className="flex flex-col gap-2 items-center">
+          <input
+            type="text"
+            placeholder="Enter password"
+            onChange={(e) => setPassword(e.target.value)}
+            className="py-2 bg-slate-100 rounded w-96 text-black outline-none"
+          />
+          <button
+            className="py-[10px] cursor-pointer  px-6 bg-blue-500 rounded w-96 text-white hover:bg-white hover:text-black border"
+            onClick={handleDashboard}
+          >
+            Unlock
+          </button>
+        </div>
       </div>
+
+      {checkPass && (
+        <div className="text-red-500 my-2">Please provide valid password </div>
+      )}
     </div>
   );
 };

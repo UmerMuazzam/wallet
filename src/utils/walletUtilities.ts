@@ -4,7 +4,8 @@ import { Web3 } from "web3";
 import { pbkdf2 } from "crypto";
 import * as aes from "aes-js";
 
-const web3 = new Web3();
+// initiating web 3 wallet 
+const web3 = new Web3("HTTP://127.0.0.1:7545");
 
 // function to generate mnemonics
 export const generateMnemonics = (pass) => {
@@ -12,6 +13,22 @@ export const generateMnemonics = (pass) => {
   return mNemonics;
 };
 
+// function creating account from mnemonics 
+export const createAccount = async (mns) => {
+  localStorage.setItem("transactionHistory", JSON.stringify([]));
+  const seed = await bip39.mnemonicToSeed(mns);
+  const node = bip32.fromSeed(seed);
+  const child = node.derivePath("m/44'/60'/0'/0/0");
+  const privateKey = child.privateKey.toString("hex");
+  const account = await web3.eth.accounts.wallet.add(`0x${privateKey}`);
+  const address = account[0].address;
+  localStorage.setItem("address", address);
+  const ballance = Web3.utils.fromWei(
+    await web3.eth.getBalance(account[0].address),
+    "ether"
+  );
+  return { address, ballance };
+};
 // mnemonics encryption
 export const encryptMnemonics = async (pass, mnemo) => {
   // key generation
@@ -42,10 +59,11 @@ export const encryptMnemonics = async (pass, mnemo) => {
 export const decryptMnemonics = async (
   pass,
   mnemmonics,
-  setWrongPass,
-  setNavigate
+  router,
+  setCheckPass,
+  nav
 ) => {
-  console.log("password : ", pass, "encypted mnemonics : ", mnemmonics);
+  setCheckPass(false) 
   // key generation
   pbkdf2(
     pass,
@@ -70,39 +88,51 @@ export const decryptMnemonics = async (
           throw new Error();
         }
         // JSON.parse(decryptedText);
-        console.log("decrypted mnemonics : ", decryptedText);
-        setWrongPass(false);
-        setNavigate(true);
+        router.push(`${nav}`) 
+        return true
       } catch (error) {
-        console.log(error);
-        setWrongPass(true);
+        setCheckPass(true)
+        return Promise.reject("Error: wrong password")
       }
     }
   );
 };
 
-export const createAccount = async (mns) => {
-  const seed = await bip39.mnemonicToSeed(mns);
 
-  const node = bip32.fromSeed(seed);
-  const child = node.derivePath("m/44'/60'/0'/0/0");
-  const privateKey = child.privateKey.toString("hex");
-  const account = await web3.eth.accounts.wallet.add(`0x${privateKey}`);
-  const address = account[0].address;
-  localStorage.setItem("address", address);
-  const ballance = Web3.utils.fromWei(
-    await web3.eth.getBalance(account[0].address),
-    "ether"
-  );
-  return { address, ballance };
-};
-
+// geting details of an account 
 export const getDetails = async () => {
   const address = localStorage.getItem("address");
   const ballance = await Web3.utils.fromWei(
     await web3.eth.getBalance(address),
     "ether"
   );
+  // const ballance = await web3.eth.getBalance(address)
 
   return { address, ballance };
 };
+
+
+// sending transaction to an account or address 
+export const transferEther = async(sendFrom,sendTo,amount)=>{
+  const transactionHistoryString = localStorage.getItem("transactionHistory");
+  const transactionHistory = JSON.parse(transactionHistoryString);
+  
+  try {
+    const tx =
+    {
+      from: sendFrom,
+      to: sendTo,
+      value: web3.utils.toWei(amount, 'ether')
+    };
+     
+    const txReceipt = await web3.eth.sendTransaction(tx);
+    const txHash = txReceipt.transactionHash 
+    const transaction = await web3.eth.getTransaction(txHash)
+    const {from,to,value} = transaction;
+    let txHistory = [...transactionHistory,{ from, to, value: Web3.utils.fromWei(value, "ether") }];
+    localStorage.setItem("transactionHistory", JSON.stringify(txHistory));
+    
+  } catch (error) {
+    console.log(error)
+  }
+}

@@ -26,13 +26,13 @@ const page = () => {
 
       <div className="flex flex-col gap-4 mt-4 justify-center items-center">
         <button
-          className="py-2 bg-slate-400 rounded w-96 text-white hover:bg-white hover:text-black border"
+          className="py-2 bg-blue-500 rounded w-96 text-white hover:bg-white hover:text-black border"
           onClick={handleAccount}
         >
           Create wallet
         </button>
         <button
-          className="py-2 bg-slate-400 rounded w-96 text-white border hover:bg-white hover:text-black "
+          className="py-2 bg-blue-500 rounded w-96 text-white border hover:bg-white hover:text-black "
           onClick={handleRestore}
         >
           Restore wallet

@@ -1,7 +1,7 @@
 "use client";
 
 import Logo from "@/components/Logo";
-import { generateMnemonics } from "@/utils/generateMnemonics";
+import { generateMnemonics } from "@/utils/walletUtilities";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
@@ -11,10 +11,10 @@ const page = () => {
 
   const handleMnemonics = () => {
     if (password.length < 8) {
-      return;
+      return alert("Password must be at least 8 characters")
     }
-    const res = generateMnemonics(password);
-    router.push("/mnemonics")
+    const res = generateMnemonics(password); 
+    router.push(`/mnemonics?mnemonics=${res}&password=${password}`);
   };
 
   return (
@@ -30,18 +30,20 @@ const page = () => {
           <b>NOTE : </b> Password must be at least of 8 character
         </div>
 
-        <input
-          type="text"
-          placeholder="Enter password"
-          onChange={(e) => setPassword(e.target.value)}
-          className="py-2 bg-slate-100 rounded w-96 text-black outline-none"
-        />
-        <span
-          className="py-[10px] cursor-pointer  px-6 bg-slate-400 rounded w-96 text-white hover:bg-white hover:text-black border"
-          onClick={handleMnemonics}
-        >
-          Login
-        </span>
+        <div className="flex flex-col gap-2 items-center">
+          <input
+            type="text"
+            placeholder="Enter password"
+            onChange={(e) => setPassword(e.target.value)}
+            className="py-2 bg-slate-100 rounded w-96 text-black outline-none"
+          />
+          <button
+            className="py-[8px] cursor-pointer  px-6 bg-blue-500 rounded w-96 text-white hover:bg-white hover:text-black border"
+            onClick={handleMnemonics}
+          >
+            Login
+          </button>
+        </div>
       </div>
     </div>
   );

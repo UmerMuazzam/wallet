@@ -1,18 +1,30 @@
 "use client";
 
-import { getDetails } from "@/utils/generateMnemonics";
+import { getDetails } from "@/utils/walletUtilities";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const page = () => {
+  const transactionHistoryString = localStorage.getItem("transactionHistory");
+  const transactionHistory = JSON.parse(transactionHistoryString); 
+
   const [accAddress, setAccAddress] = useState("");
   const [accBallance, setAccBallance] = useState("");
+  const router= useRouter();
 
   const getData = async () => {
     const { address, ballance } = await getDetails();
     setAccAddress(address);
     setAccBallance(ballance);
   };
+
+  const handleSendTransaction=()=>{
+    router.push(`/dashboard/transaction?ballance=${accBallance}`);
+  }
+  const handleRecieve=()=>{
+    router.push(`/dashboard/receive?address=${accAddress}`);
+  }
 
   useEffect(() => {
     getData();
@@ -49,13 +61,45 @@ const page = () => {
               width={40}
               alt="Creata logo"
             />
-            <span>{accBallance} CTA</span>
+            <span>{accBallance} ETH</span>
           </div>
           <div className="flex justify-between gap-8">
-            <span className="rounded p-8 bg-white">Send</span>
-            <span className="rounded p-8 bg-white">Receive</span>
-            <span className="rounded p-8 bg-white">ICP Send</span>
+            <span
+              className="rounded p-8 bg-white cursor-pointer"
+              onClick={handleSendTransaction}
+            >
+              Send
+            </span>
+            <span className="rounded p-8 bg-white cursor-pointer" onClick={handleRecieve}>Receive</span>
+            <span className="rounded p-8 bg-white cursor-pointer">
+              ICP Send
+            </span>
           </div>
+        </div>
+        <div className="w-[900px] mt-8 mb-6 mx-auto h-[2px]  bg-slate-300"></div>
+        <div className="my-5">
+          <h2>Record Maintained</h2>
+          {transactionHistory.map((item, i) => {
+            return (
+              <div
+                className="flex flex-col  w-[650px] p-8 gap-2 bg-slate-50 my-3"
+                key={i}
+              >
+                <span className="text-gray-500">
+                  <b>Sender</b> : {item.from}
+                </span>
+                <span className="text-gray-500">
+                  <b>Reciever</b> : {item.to}
+                </span>
+                <span className="text-gray-500">
+                  <b>Amount Send </b> : {item.value}
+                </span>
+                <span className="text-gray-500">
+                  <b>Status</b> : Successfull
+                </span>
+              </div>
+            );
+          })}
         </div>
       </div>
     </>
