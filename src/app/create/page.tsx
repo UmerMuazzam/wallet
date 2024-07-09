@@ -9,30 +9,25 @@ import React, { useState } from "react";
 const page = () => {
   const [password, setPassword] = useState("");
   const [confirmPass, setConfirmPass] = useState("");
-  const [matched,setMatched]=useState(true)
-  const router= useRouter()
- 
-  const onChangeHandler= (e)=>{
-    setMatched(true)
-    if (e.target.name == "password")
-    {
-      setPassword(e.target.value)
+  const [matched, setMatched] = useState(true);
+  const router = useRouter();
+
+  const onChangeHandler = (e) => {
+    setMatched(true);
+    if (e.target.name == "password") {
+      setPassword(e.target.value);
+    } else {
+      setConfirmPass(e.target.value);
     }
-    else{
-      setConfirmPass(e.target.value)
-    }
-  }
-
-
-
+  };
 
   const handleMnemonics = () => {
-    if (password != confirmPass)  return setMatched(false)
-      setMatched(true)
-      if (password.length < 8) {
-        return alert("Password must be at least 8 characters");
-      }
-    const res = generateMnemonics(password); 
+    if (password != confirmPass) return setMatched(false);
+    setMatched(true);
+    if (password.length < 8) {
+      return alert("Password must be at least 8 characters");
+    }
+    const res = generateMnemonics(password);
     router.push(`/mnemonics?mnemonics=${res}&password=${password}`);
   };
 
@@ -65,11 +60,9 @@ const page = () => {
           />
 
           {/* password mismatch error   */}
-          {!matched && (
-            <Error>Password Mismatched</Error>
-          )}
+          {!matched && <Error>Password Mismatched</Error>}
 
-          <div className="w-[100%] flex items-center gap-2 mt-4">
+          <div className="w-[100%] text-blue flex items-center gap-2 mt-4">
             <input type="checkbox" className="h-4 w-4" /> I have read all the
             Terms and Conditions
           </div>

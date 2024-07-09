@@ -11,13 +11,13 @@ const page = () => {
   const searchParams = useSearchParams();
 
   const mnemonics = searchParams.get("mnemonics")?.split(" ");
-  const password = searchParams.get("password"); 
- 
+  const password = searchParams.get("password");
 
-  const handleLogin = async() => {
+  const handleLogin = async () => {
     await encryptMnemonics(password, searchParams.get("mnemonics"));
     await createAccount(searchParams.get("mnemonics"));
-    router.push(`/login?mnemonics=${searchParams.get("mnemonics")}`);
+    router.push(`/walletCreated?mnemonics=${searchParams.get("mnemonics")}`);
+    // router.push(`/login?mnemonics=${searchParams.get("mnemonics")}`);
   };
 
   return (

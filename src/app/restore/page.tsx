@@ -1,25 +1,36 @@
 "use client";
 
 import Button from "@/components/Button";
+import Error from "@/components/Error";
 import Logo from "@/components/Logo";
 import { createAccount, encryptMnemonics } from "@/utils/walletUtilities";
+import { match } from "assert";
 import { useRouter } from "next/navigation";
-import React from "react";
+import React, { useState } from "react";
 
 const page = () => {
+  const [matched, setMatched] = useState(true);
   const router = useRouter();
 
   const handleForm = async (formData) => {
     const mnemonics = formData.get("mnemonics");
     const password = formData.get("password");
     const confirmPass = formData.get("confirmPass");
-
-    console.log("mnemonics", mnemonics,"password", password,"confirmPass", confirmPass)
-    if(confirmPass != password) return
+    console.log(
+      "mnemonics",
+      mnemonics,
+      "password",
+      password,
+      "confirmPass",
+      confirmPass
+    );
+    if (confirmPass != password) {
+      setMatched(false);
+      return;
+    }
 
     const str = mnemonics.trim();
 
-    // Check if the string is empty after trimming
     if (str === "") {
       return 0;
     }
@@ -77,7 +88,11 @@ const page = () => {
             name="confirmPass"
             className="p-3 mt-6 bg-white w-[100%] rounded-md outline-none"
           />
-
+          {!matched && (
+            <div className="mt-6">
+              <Error>Password mismatched</Error>
+            </div>
+          )}
           <div style={{ marginTop: "1.5rem" }}>
             <Button>Login</Button>
           </div>

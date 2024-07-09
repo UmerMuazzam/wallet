@@ -8,11 +8,11 @@ import { useEffect, useState } from "react";
 
 const page = () => {
   const transactionHistoryString = localStorage.getItem("transactionHistory");
-  const transactionHistory = JSON.parse(transactionHistoryString); 
+  const transactionHistory = JSON.parse(transactionHistoryString);
 
   const [accAddress, setAccAddress] = useState("");
   const [accBallance, setAccBallance] = useState("");
-  const router= useRouter();
+  const router = useRouter();
 
   const getData = async () => {
     const { address, ballance } = await getDetails();
@@ -20,20 +20,20 @@ const page = () => {
     setAccBallance(ballance);
   };
 
-  const handleSendTransaction=()=>{
+  const handleSendTransaction = () => {
     router.push(`/dashboard/transaction?ballance=${accBallance}`);
-  }
-  const handleRecieve=()=>{
+  };
+  const handleRecieve = () => {
     router.push(`/dashboard/receive?address=${accAddress}`);
-  }
+  };
 
   useEffect(() => {
     getData();
   }, [accAddress]);
 
   return (
-    <div className="container">
-      <div className="flex  justify-between items-center  m-auto p-4 bg-slate-50">
+    <div className="container  ">
+      <div className="flex  justify-between rounded-t-md items-center  m-auto p-4 bg-slate-50">
         <Link href="/">
           <Image src="/creata.svg" height={34} width={34} alt="Creata logo" />
         </Link>
@@ -49,7 +49,7 @@ const page = () => {
         />
       </div>
       <div className=" mx-auto h-[2px]  bg-white"></div>
-      <div className="flex  flex-col   max-w-[900px] m-auto py-3 px-4 text-left bg-slate-50">
+      <div className="flex  flex-col   max-w-[900px] m-auto py-3 px-4 text-left bg-slate-50 rounded-b-md shadow-xl">
         <div className="flex flex-col gap-1  mb-6">
           <span className="text-[16px] text-left font-semibold">
             Main Account{" "}
@@ -70,7 +70,6 @@ const page = () => {
                 {accBallance} ETH
               </span>
             </span>
-             
           </div>
 
           <div className="flex gap-4 mt-6 ">
@@ -86,7 +85,6 @@ const page = () => {
             >
               Receive
             </span>
-            
           </div>
         </div>
 
@@ -94,7 +92,7 @@ const page = () => {
           <h2 className="text-[18px] font-semibold ">History </h2>
           {transactionHistory.map((item, i) => {
             return (
-              <div  key={i}>
+              <div key={i}>
                 <div className="flex flex-col    gap-2   my-6">
                   <span className="text-gray-500 text-[14px]">
                     <b>Sender</b> : {item.from}

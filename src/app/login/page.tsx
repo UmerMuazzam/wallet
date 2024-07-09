@@ -8,13 +8,12 @@ import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useState } from "react";
 
-
 const page = () => {
   const [password, setPassword] = useState("");
-  const [checkPass, setCheckPass] = useState(false); 
-  const router = useRouter();  
+  const [checkPass, setCheckPass] = useState(false);
+  const router = useRouter();
   const mnemonics = localStorage.getItem("mnemonics");
-  
+
   const handleDashboard = async () => {
     try {
       const res = await decryptMnemonics(
@@ -24,9 +23,8 @@ const page = () => {
         setCheckPass,
         "/dashboard"
       );
-      
     } catch (error) {
-      console.log(error,"something went wrong");
+      console.log(error, "something went wrong");
       setCheckPass(true);
     }
   };
@@ -56,7 +54,7 @@ const page = () => {
             className="p-3 bg-white w-[70%] rounded-lg placeholder:text-blue-950 outline-none "
           />
           {/* error validation  */}
-          {checkPass && <Error> Password Mismatched</Error>}
+          {checkPass && <Error> Password Not Correct</Error>}
 
           <button className="mt-4" onClick={handleDashboard}>
             <Button>Unlock</Button>

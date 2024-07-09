@@ -1,9 +1,19 @@
-import Button from '@/components/Button';
-import Logo from '@/components/Logo'
-import Image from 'next/image';
-import React from 'react'
+"use client";
+
+import Button from "@/components/Button";
+import Logo from "@/components/Logo";
+import Image from "next/image";
+import { useRouter, useSearchParams } from "next/navigation";
+import React from "react";
 
 const page = () => {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  const handleContinue = () => {
+    router.push(`/login?mnemonics=${searchParams.get("mnemonics")}`);
+  };
+
   return (
     <div className="container text-center">
       <div>
@@ -23,11 +33,11 @@ const page = () => {
           Your wallet has been created successfully
         </h2>
       </div>
-      <div className="mt-16">
+      <div className="mt-16" onClick={handleContinue}>
         <Button>Continue</Button>
       </div>
     </div>
   );
-}
+};
 
-export default page
+export default page;

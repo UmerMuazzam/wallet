@@ -4,8 +4,8 @@ import { Web3 } from "web3";
 import { pbkdf2 } from "crypto";
 import * as aes from "aes-js";
 
-// initiating web 3 wallet 
-const web3 = new Web3("HTTP://127.0.0.1:7545");   // ganache provider
+// initiating web 3 wallet
+const web3 = new Web3(); // ganache provider
 
 // function to generate mnemonics
 export const generateMnemonics = (pass) => {
@@ -13,7 +13,7 @@ export const generateMnemonics = (pass) => {
   return mNemonics;
 };
 
-// function creating account from mnemonics 
+// function creating account from mnemonics
 export const createAccount = async (mns) => {
   localStorage.setItem("transactionHistory", JSON.stringify([]));
   const seed = await bip39.mnemonicToSeed(mns);
@@ -63,7 +63,7 @@ export const decryptMnemonics = async (
   setCheckPass,
   nav
 ) => {
-  setCheckPass(false) 
+  setCheckPass(false);
   // key generation
   pbkdf2(
     pass,
@@ -87,19 +87,18 @@ export const decryptMnemonics = async (
         if (!regex.test(decryptedText)) {
           throw new Error();
         }
-        // JSON.parse(decryptedText);
-        router.push(`${nav}`) 
-        return true
+        localStorage.setItem("password", pass);
+        router.push(`${nav}`);
+        return true;
       } catch (error) {
-        setCheckPass(true)
-        return Promise.reject("Error: wrong password")
+        setCheckPass(true);
+        return Promise.reject("Error: wrong password");
       }
     }
   );
 };
 
-
-// geting details of an account 
+// geting details of an account
 export const getDetails = async () => {
   const address = localStorage.getItem("address");
   const ballance = await Web3.utils.fromWei(
@@ -109,29 +108,29 @@ export const getDetails = async () => {
   return { address, ballance };
 };
 
-
-// sending transaction to an account or address 
-export const transferEther = async(sendFrom,sendTo,amount)=>{
+// sending transaction to an account or address
+export const transferEther = async (sendFrom, sendTo, amount) => {
   const transactionHistoryString = localStorage.getItem("transactionHistory");
   const transactionHistory = JSON.parse(transactionHistoryString);
-  
+
   try {
-    const tx =
-    {
+    const tx = {
       from: sendFrom,
       to: sendTo,
-      value: web3.utils.toWei(amount, 'ether')
+      value: web3.utils.toWei(amount, "ether"),
     };
-     
+
     const txReceipt = await web3.eth.sendTransaction(tx);
-    const txHash = txReceipt.transactionHash 
-    const transaction = await web3.eth.getTransaction(txHash)
-    const {from,to,value} = transaction;
-    let txHistory = [...transactionHistory,{ from, to, value: Web3.utils.fromWei(value, "ether") }];
+    const txHash = txReceipt.transactionHash;
+    const transaction = await web3.eth.getTransaction(txHash);
+    const { from, to, value } = transaction;
+    let txHistory = [
+      ...transactionHistory,
+      { from, to, value: Web3.utils.fromWei(value, "ether") },
+    ];
     localStorage.setItem("transactionHistory", JSON.stringify(txHistory));
-    
   } catch (error) {
-    console.log(error)
-    alert("Transaction denied")
+    console.log(error);
+    alert("Transaction denied");
   }
-}
+};

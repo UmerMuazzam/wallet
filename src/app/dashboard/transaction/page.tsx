@@ -1,5 +1,6 @@
 "use client";
 
+import Button from "@/components/Button";
 import Logo from "@/components/Logo";
 import { decryptMnemonics, transferEther } from "@/utils/walletUtilities";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -8,18 +9,20 @@ import React, { useState } from "react";
 const page = () => {
   const searchParams = useSearchParams();
   const ballance = searchParams.get("ballance");
-  const router= useRouter()
-    const [checkPass, setCheckPass]=useState(false);
-    const mnemonics = localStorage.getItem("mnemonics");
+  const router = useRouter();
+  const [checkPass, setCheckPass] = useState(false);
+  const mnemonics = localStorage.getItem("mnemonics");
+  const localPass = localStorage.getItem("password");
+  console.log("localPass ", localPass);
 
   const handleSubmit = async (formData) => {
-    const myAdd= localStorage.getItem("address")
+    const myAdd = localStorage.getItem("address");
     const recieverAdd = formData.get("address");
     const password = formData.get("password");
     const amount = formData.get("amount");
- 
-    if(password.length < 8) return alert("Password must be at least of 8 characters")
-     
+
+    if (password.length < 8)
+      return alert("Password must be at least of 8 characters");
 
     try {
       const res = await decryptMnemonics(
@@ -29,65 +32,65 @@ const page = () => {
         setCheckPass,
         "/dashboard"
       );
-      const txReceipt= await transferEther(myAdd, recieverAdd, amount);
-    //   router.push("/dashboard")
-
+      const txReceipt = await transferEther(myAdd, recieverAdd, amount);
+      //   router.push("/dashboard")
     } catch (error) {
       console.log(error, "something went wrong");
-      setCheckPass(true); 
+      setCheckPass(true);
     }
-     
   };
 
   return (
-    <div className="container">
+    <div className="container  text-center">
       <div>
         <Logo />
-        <h3>Send your transaction to the Ethereum blockchain</h3>
+        <h3 className="text-[18px] font-semibold my-8">
+          Send your transaction to the Ethereum blockchain
+        </h3>
         <form
           action={handleSubmit}
-          className="flex flex-col bg-slate-50 py-4 justify-center items-center"
+          className="flex flex-col bg-slate-50 py-4 justify-center items-center rounded-md"
         >
-          <span>
-            Password{" "}
+          <span className="flex w-[100%] pt-8 px-8 gap-4   items-center">
+            <span className="font-bold w-20">Password</span>
             <input
-              className="w-[400px] outline-none"
+              className="p-3 bg-white w-[90%] rounded-md outline-none"
               type="text"
               placeholder="Please Enter password"
               id="password"
-              name="password" required
+              name="password"
+              required
             />
           </span>
-          <span>
-            Address{" "}
+          <span className="flex w-[100%] pt-8 px-8 gap-4  first-letter: items-center">
+            <span className="font-bold w-20">Address</span>
             <input
-              className="w-[400px] outline-none"
+              className="p-3   bg-white w-[90%] rounded-md outline-none"
               type="text"
               placeholder="Please Enter reciever address"
               id="address"
-              name="address" required
+              name="address"
+              required
             />
           </span>
-          <span>
+          <span className="flex w-[100%] p-8  gap-4   items-center">
             {" "}
-            Amount{" "}
+            <span className="font-bold w-20">Amount</span>
             <input
-              className="w-[400px] outline-none"
+              className="p-3   bg-white w-[90%] rounded-md outline-none"
               type="number"
               placeholder="Please Enter amount to send"
               id="amount"
-              name="amount" required
+              name="amount"
+              required
             />
           </span>
-          <button
-            type="submit"
-            className="py-[10px] cursor-pointer flex-grow-0  px-6 bg-blue-500 rounded w-32 ml-12 text-white hover:bg-white hover:text-black border"
-          >
-            Submit
-          </button>
+          <Button>Send</Button>
         </form>
       </div>
-      {checkPass &&<div className="text-red-500 my-2 ">Please provide valid password</div>}
+      {checkPass && (
+        <div className="text-red-500 my-2 ">Please provide valid password</div>
+      )}
     </div>
   );
 };
