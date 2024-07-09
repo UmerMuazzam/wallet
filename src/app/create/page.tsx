@@ -1,5 +1,6 @@
 "use client";
 
+import Error from "@/components/Error";
 import Logo from "@/components/Logo";
 import { generateMnemonics } from "@/utils/walletUtilities";
 import { useRouter } from "next/navigation";
@@ -7,42 +8,81 @@ import React, { useState } from "react";
 
 const page = () => {
   const [password, setPassword] = useState("");
+  const [confirmPass, setConfirmPass] = useState("");
+  const [matched,setMatched]=useState(true)
   const router= useRouter()
+ 
+  const onChangeHandler= (e)=>{
+    setMatched(true)
+    if (e.target.name == "password")
+    {
+      setPassword(e.target.value)
+    }
+    else{
+      setConfirmPass(e.target.value)
+    }
+  }
+
+
+
 
   const handleMnemonics = () => {
-    if (password.length < 8) {
-      return alert("Password must be at least 8 characters")
-    }
+    if (password != confirmPass)  return setMatched(false)
+      setMatched(true)
+      if (password.length < 8) {
+        return alert("Password must be at least 8 characters");
+      }
     const res = generateMnemonics(password); 
     router.push(`/mnemonics?mnemonics=${res}&password=${password}`);
   };
 
   return (
     <div className="container">
-      <div className="h-container">
+      <div className="">
         <Logo />
       </div>
-      <div className="createAcc">
-        <h2 className="my-4">Create a new account</h2>
-
-        <div className="text-gray-400">
-          {" "}
-          <b>NOTE : </b> Password must be at least of 8 character
-        </div>
-
-        <div className="flex flex-col gap-2 items-center">
+      <h2 className="text-[18px] font-semibold text-center my-12">
+        Choose a password for your wallet
+      </h2>
+      <div className="">
+        <div className="flex flex-col gap-6 items-center">
           <input
-            type="text"
-            placeholder="Enter password"
-            onChange={(e) => setPassword(e.target.value)}
-            className="py-2 bg-slate-100 rounded w-96 text-black outline-none"
+            type="password"
+            placeholder="Enter new password"
+            onChange={onChangeHandler}
+            className="p-3 bg-white w-[100%] rounded-lg placeholder:text-blue-950 outline-none "
+            id="password"
+            name="password"
           />
+
+          <input
+            type="password"
+            placeholder="Confirm password"
+            onChange={onChangeHandler}
+            className="p-3 bg-white w-[100%] rounded-lg placeholder:text-blue-950 outline-none "
+            id="confirmPass"
+            name="confirmPass"
+          />
+
+          {/* password mismatch error   */}
+          {!matched && (
+            <Error>Password Mismatched</Error>
+          )}
+
+          <div className="w-[100%] flex items-center gap-2 mt-4">
+            <input type="checkbox" className="h-4 w-4" /> I have read all the
+            Terms and Conditions
+          </div>
+
           <button
-            className="py-[8px] cursor-pointer  px-6 bg-blue-500 rounded w-96 text-white hover:bg-white hover:text-black border"
+            className=" bg-blue text-[18px] font-normal text-white w-[240px]  h-[50px] rounded-lg shadow-lg mt-20 hover:animate-pulse"
             onClick={handleMnemonics}
           >
-            Login
+            Continue
           </button>
+          <span className="text-[18px] font-normal italic mt-[-10px] underline cursor-pointer">
+            Cancel Process
+          </span>
         </div>
       </div>
     </div>

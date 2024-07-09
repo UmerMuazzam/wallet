@@ -1,5 +1,6 @@
 "use client";
 
+import Button from "@/components/Button";
 import Logo from "@/components/Logo";
 import { createAccount, encryptMnemonics } from "@/utils/walletUtilities";
 import { useRouter } from "next/navigation";
@@ -11,8 +12,20 @@ const page = () => {
   const handleForm = async (formData) => {
     const mnemonics = formData.get("mnemonics");
     const password = formData.get("password");
+    const confirmPass = formData.get("confirmPass");
 
-    if (mnemonics.split(" ").length != 12)
+    console.log("mnemonics", mnemonics,"password", password,"confirmPass", confirmPass)
+    if(confirmPass != password) return
+
+    const str = mnemonics.trim();
+
+    // Check if the string is empty after trimming
+    if (str === "") {
+      return 0;
+    }
+    const words = str.split(/\s+/);
+
+    if (words.length != 12)
       return alert("Please enter 12 mnemonics not less than 12 nor greater");
     await createAccount(mnemonics);
     await encryptMnemonics(password, mnemonics);
@@ -22,41 +35,51 @@ const page = () => {
   return (
     <>
       <Logo />
-      <div className="container">
+      <div className="container text-center">
         <form action={handleForm}>
-          <h2 style={{ marginBottom: "1rem" }}>Please enter mnemonics </h2>
-          <textarea
+          <h2
             style={{
-              height: "20vh",
-              width: "100%",
-              border: "2px solid gray",
-              outline: "none",
-              padding: "1rem",
-              borderRadius: "4px",
+              marginBottom: "1rem",
+              fontSize: "1.3rem",
+              fontWeight: "500",
             }}
-            type="textarea"
-            placeholder="Mnemonic words "
-            required
+          >
+            Restore Wallet
+          </h2>
+
+          <div className="bg-white p-4 text-[13px] rounded-md mb-6 text-blue">
+            Creata Chain does not keep a copy of your password. If you’re having
+            trouble unlocking your account, you will need to reset your wallet.
+            You can do this by providing the Secret Recovery Phrase you used
+            when you set up your wallet.
+          </div>
+
+          <input
+            type="text"
+            placeholder="Mnemonics phrase"
             id="mnemonics"
             name="mnemonics"
+            className="w-[100%] bg-white rounded-md outline-none p-3"
           />
-          <h3>Please enter password</h3>
 
-          <div className="flex flex-col items-center">
-            <input
-              type="text"
-              placeholder="Enter new password"
-              required
-              id="password"
-              name="password"
-              className="py-2 bg-slate-100 rounded w-96 text-black outline-none"
-            />
-            <button
-              type="submit"
-              className="py-[10px] cursor-pointer flex-grow-0  px-6 bg-blue-500 rounded w-96 text-white hover:bg-white hover:text-black border"
-            >
-              Login
-            </button>
+          <input
+            type="password"
+            placeholder="Enter new password"
+            id="password"
+            name="password"
+            className="p-3 mt-6 bg-white w-[100%] rounded-md outline-none focus:outline-none focus:bg-white"
+          />
+
+          <input
+            type="password"
+            placeholder="Confirm password"
+            id="confirmPass"
+            name="confirmPass"
+            className="p-3 mt-6 bg-white w-[100%] rounded-md outline-none"
+          />
+
+          <div style={{ marginTop: "1.5rem" }}>
+            <Button>Login</Button>
           </div>
         </form>
       </div>

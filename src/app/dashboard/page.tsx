@@ -2,6 +2,7 @@
 
 import { getDetails } from "@/utils/walletUtilities";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -28,81 +29,96 @@ const page = () => {
 
   useEffect(() => {
     getData();
-  }, []);
+  }, [accAddress]);
 
   return (
-    <>
-      <div className="flex justify-between items-center max-w-[900px] m-auto p-2">
-        <Image src="/creata.png" height={64} width={64} alt="Creata logo" />
-        <span className="py-2 px-4 w-[300px] bg-slate-100 rounded">
+    <div className="container">
+      <div className="flex  justify-between items-center  m-auto p-4 bg-slate-50">
+        <Link href="/">
+          <Image src="/creata.svg" height={34} width={34} alt="Creata logo" />
+        </Link>
+        <span className="py-2 px-4   font-semibold bg-white rounded">
           Zenith Chain
         </span>
         <Image
-          className="w-9 h-9 cursor-pointer rounded p-1 bg-slate-100"
-          src="/account.png"
-          width={24}
-          height={8}
+          className="w-9 h-9 cursor-pointer rounded-xl p-2 bg-white"
+          src="/account.svg"
+          width={10}
+          height={10}
           alt="Creata logo"
         />
       </div>
-      <div className="max-w-[900px] my-2 mx-auto h-[2px]  bg-slate-300"></div>
-      <div className="flex  flex-col items-center max-w-[900px] m-auto p-2 text-left">
-        <h1 className="mb-4">Your Creata chain wallet</h1>
-        <div className="flex flex-col gap-1 w-[650px] mb-6">
-          <span className="text-xl font-semibold">Main Account </span>{" "}
-          <span className="text-sm text-gray-500">{accAddress}</span>
+      <div className=" mx-auto h-[2px]  bg-white"></div>
+      <div className="flex  flex-col   max-w-[900px] m-auto py-3 px-4 text-left bg-slate-50">
+        <div className="flex flex-col gap-1  mb-6">
+          <span className="text-[16px] text-left font-semibold">
+            Main Account{" "}
+          </span>{" "}
+          <span className="text-[13px]  text-gray-500">{accAddress}</span>
         </div>
-        <div className="flex flex-col gap-8 bg-slate-100 p-8 w-[650px] h-[300px]">
-          <div>
-            <Image
-              className="p-1 rounded shadow bg-white my-2"
-              src="/creata.png"
-              height={40}
-              width={40}
-              alt="Creata logo"
-            />
-            <span>{accBallance} ETH</span>
+        <div className="flex flex-col items-center justify-center p-8  bg-slate-50  rounded-xl border-2 border-white">
+          <div className="flex gap-6">
+            <span className="flex flex-col items-center">
+              <Image
+                className="py-2 px-3 rounded-lg shadow-md bg-white my-2"
+                src="/creata.svg"
+                height={48}
+                width={48}
+                alt="Creata logo"
+              />
+              <span className="text-blue font-bold text-[18px]">
+                {accBallance} ETH
+              </span>
+            </span>
+             
           </div>
-          <div className="flex justify-between gap-8">
+
+          <div className="flex gap-4 mt-6 ">
             <span
-              className="rounded p-8 bg-white cursor-pointer"
+              className="rounded-lg w-24 flex items-center justify-center shadow-md h-16 bg-white cursor-pointer  hover:shadow-xl"
               onClick={handleSendTransaction}
             >
               Send
             </span>
-            <span className="rounded p-8 bg-white cursor-pointer" onClick={handleRecieve}>Receive</span>
-            <span className="rounded p-8 bg-white cursor-pointer">
-              ICP Send
+            <span
+              className="rounded-lg w-24 flex items-center justify-center shadow-md h-16 bg-white cursor-pointer hover:shadow-xl"
+              onClick={handleRecieve}
+            >
+              Receive
             </span>
+            
           </div>
         </div>
-        <div className="w-[900px] mt-8 mb-6 mx-auto h-[2px]  bg-slate-300"></div>
+
         <div className="my-5">
-          <h2>Record Maintained</h2>
+          <h2 className="text-[18px] font-semibold ">History </h2>
           {transactionHistory.map((item, i) => {
             return (
-              <div
-                className="flex flex-col  w-[650px] p-8 gap-2 bg-slate-50 my-3"
-                key={i}
-              >
-                <span className="text-gray-500">
-                  <b>Sender</b> : {item.from}
-                </span>
-                <span className="text-gray-500">
-                  <b>Reciever</b> : {item.to}
-                </span>
-                <span className="text-gray-500">
-                  <b>Amount Send </b> : {item.value}
-                </span>
-                <span className="text-gray-500">
-                  <b>Status</b> : Successfull
-                </span>
+              <div  key={i}>
+                <div className="flex flex-col    gap-2   my-6">
+                  <span className="text-gray-500 text-[14px]">
+                    <b>Sender</b> : {item.from}
+                  </span>
+                  <span className="text-gray-500 text-[14px]">
+                    <b>Reciever</b> : {item.to}
+                  </span>
+                  <span className="text-gray-500 text-[14px]">
+                    <b>Amount Send </b> : {item.value}
+                  </span>
+                  <span className="text-gray-500 text-[14px]">
+                    <b>Status</b> :{" "}
+                    <span className="rounded text-[12px] bg-green-400 px-2 py-1 text-white">
+                      Successfull
+                    </span>
+                  </span>
+                </div>
+                <div className="h-[2px] bg-white w-[100%]"></div>
               </div>
             );
           })}
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

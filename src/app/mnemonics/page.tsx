@@ -11,7 +11,7 @@ const page = () => {
   const searchParams = useSearchParams();
 
   const mnemonics = searchParams.get("mnemonics")?.split(" ");
-  const password = searchParams.get("password");
+  const password = searchParams.get("password"); 
  
 
   const handleLogin = async() => {
@@ -25,29 +25,26 @@ const page = () => {
       <Logo />
 
       <div>
-        <div className="text-xl font-semibold my-4">
+        <div className="text-[18px] text-center font-semibold my-4 mt-[48px]">
           Write down your backup seed phrase
         </div>
-        <div className="max-w-[440px] m-auto text-blue-500 bg-slate-100 p-4">
+        <div className="max-w-[480px] italic text-[16px] font-normal text-blue m-auto text-blue-500 bg-white py-4 px-6 rounded-lg">
           Please Note It Down Some Save Place, and never reveal it to some one,
           it will also never appear again{" "}
         </div>
       </div>
 
-      <div className="flex gap-2 justify-center items-center mt-10 mb-8 mx-auto flex-wrap w-[600px]">
+      <div className="flex gap-4 justify-center items-center mt-10 mb-8 mx-auto flex-wrap  ">
         {mnemonics?.map((item, i) => {
           return (
-            <span
-              key={i}
-              className="bg-slate-100 p-4 min-w-32 text-left rounded"
-            >
-                {item}
+            <span key={i} className="bg-white p-4 min-w-40 text-left rounded">
+              {item}
             </span>
           );
         })}
       </div>
 
-      <div onClick={handleLogin}>
+      <div className="text-center mt-16" onClick={handleLogin}>
         <Button>Continue</Button>
       </div>
     </div>

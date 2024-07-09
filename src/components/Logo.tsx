@@ -1,12 +1,20 @@
 import Image from "next/image";
+import Link from "next/link";
 import React from "react";
 
 const Logo = () => {
   return (
     <div>
-      <div className="flex items-center gap-1 text-2xl uppercase font-semibold justify-center">
-        <Image src="/creata.png" alt="Logo image" width={64} height={64} />
-        <span>creatachain</span>
+      <div className="flex items-center  text-[16px] uppercase font-semibold gap-4 justify-center mt-4">
+        <Link href="/">
+          <Image
+            className="rounded"
+            src="/creatalogo.svg"
+            alt="Logo image"
+            width={180}
+            height={180}
+          />
+        </Link> 
       </div>
     </div>
   );

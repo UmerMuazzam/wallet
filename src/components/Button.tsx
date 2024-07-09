@@ -2,9 +2,11 @@ import React from "react";
 
 const Button = ({ children }) => {
   return (
-    <div className="bg-blue-500 rounded text-xl font-semibold border cursor-pointer w-[250px] text-white py-2 mx-auto hover:bg-white hover:text-blue-500">
+    <button
+      className=" bg-blue text-[18px] font-normal text-white w-[240px]  h-[50px] rounded-lg shadow-lg  hover:animate-pulse"
+    >
       {children}
-    </div>
+    </button>
   );
 };
 

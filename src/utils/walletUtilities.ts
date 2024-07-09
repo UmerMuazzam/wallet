@@ -5,7 +5,7 @@ import { pbkdf2 } from "crypto";
 import * as aes from "aes-js";
 
 // initiating web 3 wallet 
-const web3 = new Web3("HTTP://127.0.0.1:7545");
+const web3 = new Web3("HTTP://127.0.0.1:7545");   // ganache provider
 
 // function to generate mnemonics
 export const generateMnemonics = (pass) => {
@@ -49,8 +49,8 @@ export const encryptMnemonics = async (pass, mnemo) => {
       const encryptedBytes = aesCtr.encrypt(textBytes);
       const encryptedHex = aes.utils.hex.fromBytes(encryptedBytes);
 
-      // save encrypted mnemmonics to localStorage
-      localStorage.setItem("mnemmonics", encryptedHex);
+      // save encrypted mnemonics to localStorage
+      localStorage.setItem("mnemonics", encryptedHex);
     }
   );
 };
@@ -58,7 +58,7 @@ export const encryptMnemonics = async (pass, mnemo) => {
 //  function to decrypt mnemonics
 export const decryptMnemonics = async (
   pass,
-  mnemmonics,
+  mnemonics,
   router,
   setCheckPass,
   nav
@@ -76,7 +76,7 @@ export const decryptMnemonics = async (
       // decryptMnemonics
 
       try {
-        const encryptedBytes = aes.utils.hex.toBytes(mnemmonics);
+        const encryptedBytes = aes.utils.hex.toBytes(mnemonics);
         const aesCtr = new aes.ModeOfOperation.ctr(
           derivedKey,
           new aes.Counter(5)
@@ -106,8 +106,6 @@ export const getDetails = async () => {
     await web3.eth.getBalance(address),
     "ether"
   );
-  // const ballance = await web3.eth.getBalance(address)
-
   return { address, ballance };
 };
 
@@ -134,5 +132,6 @@ export const transferEther = async(sendFrom,sendTo,amount)=>{
     
   } catch (error) {
     console.log(error)
+    alert("Transaction denied")
   }
 }

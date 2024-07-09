@@ -2,59 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
-.container {
-  max-width: 650px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  background-color: aliceblue;
+body{
+    background: linear-gradient(#f1f3f6, #deebff);
+    min-height: 100vh;
 }
-.h-container {
-}
-
-.buttons {
-  display: flex;
-  gap: 2rem;
-  justify-content: center;
-}
-
-.createAcc {
-}
-
-h1 {
-  font-size: 1.5rem;
-  font-weight: bold;
-}
-h2 {
-  font-size: 1.5rem;
-  font-weight: 500;
-}
-h3 {
-  ont-size: 1.3rem;
-  font-weight: bold;
-  margin: 1rem 0;
-}
-h4 {
-}
-
-input {
-  border-radius: 5px;
-  border: 1px solid #ececec;
-  padding: 10px;
-  margin: 10px;
-  width: 30%;
-}
-
-.create {
-  background-color: rgb(64, 52, 176);
-  color: white;
-  padding: 0.8rem 2rem;
-  width: 30%;
-  margin: auto;
-  border-radius: 4px;
-  cursor: pointer;
+.container{
+    max-width: 640px;
+    margin: auto;
+    padding: 1rem; 
 }

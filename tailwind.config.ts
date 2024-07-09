@@ -12,7 +12,8 @@ const config: Config = {
         accent:"#0989FF",
         topHeadingPrimary:"#0101fc",
         topHeadingSecondary:"#021d35",
-        pink:"#FD4B6B"
+        pink:"#FD4B6B",
+        blue:"#013EB7"
        },
        container:{
         center:true,

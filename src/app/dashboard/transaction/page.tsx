@@ -10,19 +10,16 @@ const page = () => {
   const ballance = searchParams.get("ballance");
   const router= useRouter()
     const [checkPass, setCheckPass]=useState(false);
-    const mnemonics = localStorage.getItem("mnemmonics");
+    const mnemonics = localStorage.getItem("mnemonics");
 
   const handleSubmit = async (formData) => {
     const myAdd= localStorage.getItem("address")
     const recieverAdd = formData.get("address");
     const password = formData.get("password");
     const amount = formData.get("amount");
-
-    if(ballance < amount) return alert("You didn't have enough ballance to send coins")
  
     if(password.length < 8) return alert("Password must be at least of 8 characters")
-    if (amount < 0 ||  amount > 100)
-      return alert("Ether Amount must be between 0 and 100");
+     
 
     try {
       const res = await decryptMnemonics(
@@ -37,7 +34,7 @@ const page = () => {
 
     } catch (error) {
       console.log(error, "something went wrong");
-      setCheckPass(true);
+      setCheckPass(true); 
     }
      
   };
