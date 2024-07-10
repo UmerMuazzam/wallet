@@ -5,6 +5,8 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 const page = () => {
+  const isLogin = localStorage.getItem("password") || false;
+
   const router = useRouter();
 
   const handleAccount = () => {
@@ -13,6 +15,8 @@ const page = () => {
   const handleRestore = () => {
     router.push("/restore");
   };
+
+  if (isLogin) return router.push("/dashboard");
 
   return (
     <div className="container md:mx-auto">
@@ -40,7 +44,9 @@ const page = () => {
             />
             <div className="flex flex-col  items-start">
               <span className="text-[18px] font-semibold">Create Account</span>
-              <span className="text-gray-500">Create a wallet using 12 words phrases</span>
+              <span className="text-gray-500">
+                Create a wallet using 12 words phrases
+              </span>
             </div>
           </button>
 
@@ -57,7 +63,9 @@ const page = () => {
             />
             <div className="flex flex-col  items-start">
               <span className="text-[18px] font-semibold">Restore Account</span>
-              <span className="text-gray-500">Restore account using 12 words phrases</span>
+              <span className="text-gray-500">
+                Restore account using 12 words phrases
+              </span>
             </div>
           </button>
         </div>

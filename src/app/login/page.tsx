@@ -15,20 +15,21 @@ const page = () => {
   const mnemonics = localStorage.getItem("mnemonics");
 
   const handleDashboard = async () => {
-    if (password.length < 8 ) { 
-      setCheckPass("Password cannot be less than 8 characters")
-      return
+    if (password.length < 8) {
+      setCheckPass("Password cannot be less than 8 characters");
+      return;
     }
-      try {
-        const res = await decryptMnemonics(password, mnemonics);
-        if (!res.ok) {
-          setCheckPass(res.message);
-          return;
-        }
-        router.push(`/dashboard`);
-      } catch (error) {
-        console.log(error, "something went wrong");
+    try {
+      const res = await decryptMnemonics(password, mnemonics);
+      if (!res.ok) {
+        setCheckPass(res.message);
+        return;
       }
+      localStorage.setItem("password", password);
+      router.push(`/dashboard`);
+    } catch (error) {
+      console.log(error, "something went wrong");
+    }
   };
 
   return (
@@ -48,7 +49,7 @@ const page = () => {
         To the Creata Chain blockchain
       </h3>
       <div className="">
-        <div className="flex flex-col gap-2 items-center">
+        <div className="flex flex-col gap-4 items-center">
           <input
             type="password"
             placeholder="Enter password"

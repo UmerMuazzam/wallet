@@ -1,5 +1,6 @@
 "use client";
-
+import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
+import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { getDetails } from "@/utils/walletUtilities";
 import Image from "next/image";
 import Link from "next/link";
@@ -7,12 +8,19 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const page = () => {
+  const isLogin = localStorage.getItem("password") || false;
   const transactionHistoryString = localStorage.getItem("transactionHistory");
   const transactionHistory = JSON.parse(transactionHistoryString);
 
   const [accAddress, setAccAddress] = useState("");
   const [accBallance, setAccBallance] = useState("");
   const router = useRouter();
+
+  const handleLogout = (e) => {
+    localStorage.clear();
+    console.log("all clear");
+    router.push(`/`);
+  };
 
   const getData = async () => {
     const { address, ballance } = await getDetails();
@@ -31,6 +39,8 @@ const page = () => {
     getData();
   }, [accAddress]);
 
+  if (!isLogin) return router.push("/");
+
   return (
     <div className="container  ">
       <div className="flex  justify-between rounded-t-md items-center  m-auto p-4 bg-slate-50">
@@ -40,13 +50,38 @@ const page = () => {
         <span className="py-2 px-4   font-semibold bg-white rounded">
           Zenith Chain
         </span>
-        <Image
-          className="w-9 h-9 cursor-pointer rounded-xl p-2 bg-white"
-          src="/account.svg"
-          width={10}
-          height={10}
-          alt="Creata logo"
-        />
+
+        <Menu as="div" className="relative inline-block text-left">
+          <div>
+            <MenuButton>
+              <Image
+                className="w-9 h-9 cursor-pointer rounded-xl p-2 bg-white"
+                src="/account.svg"
+                width={10}
+                height={10}
+                alt="Creata logo"
+              />
+            </MenuButton>
+          </div>
+
+          <MenuItems
+            transition
+            className="absolute right-0 z-10 mt-2 w-40 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
+          >
+            <div className="py-1">
+              <form action={handleLogout}>
+                <MenuItem>
+                  <button
+                    type="submit"
+                    className="block w-full px-4 py-2 text-left text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900"
+                  >
+                    Sign out
+                  </button>
+                </MenuItem>
+              </form>
+            </div>
+          </MenuItems>
+        </Menu>
       </div>
       <div className=" mx-auto h-[2px]  bg-white"></div>
       <div className="flex  flex-col   max-w-[900px] m-auto py-3 px-4 text-left bg-slate-50 rounded-b-md shadow-xl">
@@ -74,13 +109,13 @@ const page = () => {
 
           <div className="flex gap-4 mt-6 ">
             <span
-              className="rounded-lg w-24 flex items-center justify-center shadow-md h-16 bg-white cursor-pointer  hover:shadow-xl"
+              className="rounded-lg w-28 flex items-center justify-center shadow-md h-16 bg-white cursor-pointer  hover:shadow-xl"
               onClick={handleSendTransaction}
             >
               Send
             </span>
             <span
-              className="rounded-lg w-24 flex items-center justify-center shadow-md h-16 bg-white cursor-pointer hover:shadow-xl"
+              className="rounded-lg w-28 flex items-center justify-center shadow-md h-16 bg-white cursor-pointer hover:shadow-xl"
               onClick={handleRecieve}
             >
               Receive
@@ -90,7 +125,7 @@ const page = () => {
 
         <div className="my-5">
           <h2 className="text-[18px] font-semibold ">History </h2>
-          {transactionHistory.map((item, i) => {
+          {transactionHistory?.map((item, i) => {
             return (
               <div key={i}>
                 <div className="flex flex-col    gap-2   my-6">

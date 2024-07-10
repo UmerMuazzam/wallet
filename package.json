@@ -9,6 +9,10 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@headlessui/react": "^2.1.2",
+    "@heroicons/react": "^2.1.4",
+    "@material-tailwind/html": "^2.2.2",
+    "@material-tailwind/react": "^2.1.9",
     "@reduxjs/toolkit": "^2.2.5",
     "aes-js": "^3.1.2",
     "axios": "^1.7.2",

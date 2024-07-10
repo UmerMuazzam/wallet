@@ -6,7 +6,7 @@ import Logo from "@/components/Logo";
 import { createAccount, encryptMnemonics } from "@/utils/walletUtilities";
 import { useRouter } from "next/navigation";
 import React from "react";
- 
+
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 
@@ -19,12 +19,12 @@ const SignupSchema = Yup.object().shape({
     .min(8, "Too Short!")
     .max(50, "Too Long!")
     .required("Required"),
-  confirmPass: Yup.string().required("Required").oneOf([Yup.ref("password"), null], "Passwords must match"),
+  confirmPass: Yup.string()
+    .required("Required")
+    .oneOf([Yup.ref("password"), null], "Passwords must match"),
 });
 
-
-
-const page = () => { 
+const page = () => {
   const router = useRouter();
 
   return (
@@ -38,7 +38,7 @@ const page = () => {
           confirmPass: "",
         }}
         validationSchema={SignupSchema}
-        onSubmit={ async(values) => { 
+        onSubmit={async (values) => {
           console.log(values);
           await createAccount(mnemonics);
           await encryptMnemonics(password, mnemonics);
@@ -69,7 +69,7 @@ const page = () => {
               placeholder="Mnemonics phrase"
               id="mnemonics"
               name="mnemonics"
-              className="w-[100%] mb-6 bg-white rounded-md outline-none p-3"
+              className="w-[100%] my-4 bg-white rounded-md outline-none p-3"
             />
             {errors.mnemonics && touched.mnemonics ? (
               <Error>{errors.mnemonics}</Error>
@@ -80,7 +80,7 @@ const page = () => {
               placeholder="Enter new password"
               id="password"
               name="password"
-              className="p-3 my-6 bg-white w-[100%] rounded-md outline-none focus:outline-none focus:bg-white"
+              className="p-3 my-4 bg-white w-[100%] rounded-md outline-none focus:outline-none focus:bg-white"
             />
             {errors.password && touched.password ? (
               <Error>{errors.password}</Error>
@@ -91,7 +91,7 @@ const page = () => {
               placeholder="Confirm password"
               id="confirmPass"
               name="confirmPass"
-              className="p-3 my-6 bg-white w-[100%] rounded-md outline-none"
+              className="p-3 my-4 bg-white w-[100%] rounded-md outline-none"
             />
             {errors.confirmPass && touched.confirmPass ? (
               <Error>{errors.confirmPass}</Error>
