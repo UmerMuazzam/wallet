@@ -12,19 +12,23 @@
     "@reduxjs/toolkit": "^2.2.5",
     "aes-js": "^3.1.2",
     "axios": "^1.7.2",
+    "bcrypt": "^5.1.1",
     "bip32": "^2.0.6",
     "bip39": "^3.1.0",
+    "formik": "^2.4.6",
     "mongoose": "^8.4.4",
     "next": "14.2.4",
     "next-auth": "^4.24.7",
     "pbkdf2": "^3.1.2",
+    "pbkdf2-sha256": "^1.1.1",
     "qrcode.react": "^3.1.0",
     "react": "^18",
     "react-dom": "^18",
     "react-hot-toast": "^2.4.1",
     "react-icons": "^5.2.1",
     "react-redux": "^9.1.2",
-    "web3": "^4.10.0"
+    "web3": "^4.10.0",
+    "yup": "^1.4.0"
   },
   "devDependencies": {
     "@types/node": "^20",
@@ -33,7 +37,7 @@
     "eslint": "^8",
     "eslint-config-next": "14.2.4",
     "postcss": "^8",
-    "tailwindcss": "^3.4.1",
+    "tailwindcss": "^3.4.4",
     "typescript": "^5"
   }
 }

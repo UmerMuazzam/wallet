@@ -1,14 +1,15 @@
 import * as bip39 from "bip39";
 import * as bip32 from "bip32";
 import { Web3 } from "web3";
-import { pbkdf2 } from "crypto";
+import * as pbkdf2  from "pbkdf2-sha256";
+
 import * as aes from "aes-js";
 
 // initiating web 3 wallet
-const web3 = new Web3(); // ganache provider
+const web3 = new Web3("HTTP://127.0.0.1:7545"); // ganache provider
 
 // function to generate mnemonics
-export const generateMnemonics = (pass) => {
+export const generateMnemonics = (password) => {
   const mNemonics = bip39.generateMnemonic();
   return mNemonics;
 };
@@ -30,73 +31,52 @@ export const createAccount = async (mns) => {
   return { address, ballance };
 };
 // mnemonics encryption
-export const encryptMnemonics = async (pass, mnemo) => {
-  // key generation
-  pbkdf2(
-    pass,
-    "this is just a randome string ",
-    100000,
-    32,
-    "sha512",
-    (err, derivedKey) => {
-      if (err) throw err;
-      // encryption
-      const textBytes = aes.utils.utf8.toBytes(mnemo);
-      const aesCtr = new aes.ModeOfOperation.ctr(
-        derivedKey,
-        new aes.Counter(5)
-      );
-      const encryptedBytes = aesCtr.encrypt(textBytes);
-      const encryptedHex = aes.utils.hex.fromBytes(encryptedBytes);
+export const encryptMnemonics = async (password, mnemo) => {
+  console.log(password,mnemo)
+    
+  try {
+    const derivedKey = await pbkdf2(password, 'just a random string', 1, 32, 'sha512') 
+    const textBytes = aes.utils.utf8.toBytes(mnemo);
+    const aesCtr = new aes.ModeOfOperation.ctr(
+      derivedKey,
+      new aes.Counter(5)
+    );
+    const encryptedBytes = aesCtr.encrypt(textBytes);
+    const encryptedHex = aes.utils.hex.fromBytes(encryptedBytes);
 
-      // save encrypted mnemonics to localStorage
-      localStorage.setItem("mnemonics", encryptedHex);
-    }
-  );
+    localStorage.setItem("mnemonics", encryptedHex);
+  } catch (error) {
+    console.log("Error while encrypting")
+  }
+    
 };
 
 //  function to decrypt mnemonics
-export const decryptMnemonics = async (
-  pass,
-  mnemonics,
-  router,
-  setCheckPass,
-  nav
-) => {
-  setCheckPass(false);
-  // key generation
-  pbkdf2(
-    pass,
-    "this is just a randome string ",
-    100000,
-    32,
-    "sha512",
-    async (err, derivedKey) => {
-      if (err) throw err;
-      // decryptMnemonics
+export const decryptMnemonics = async(
+  password,
+  mnemonics
+) => { 
 
-      try {
-        const encryptedBytes = aes.utils.hex.toBytes(mnemonics);
-        const aesCtr = new aes.ModeOfOperation.ctr(
-          derivedKey,
-          new aes.Counter(5)
-        );
-        const decryptedBytes = aesCtr.decrypt(encryptedBytes);
-        const decryptedText = aes.utils.utf8.fromBytes(decryptedBytes);
-        const regex = /^[A-Za-z]+(?:\s[A-Za-z]+)*$/;
-        if (!regex.test(decryptedText)) {
-          throw new Error();
-        }
-        localStorage.setItem("password", pass);
-        router.push(`${nav}`);
-        return true;
-      } catch (error) {
-        setCheckPass(true);
-        return Promise.reject("Error: wrong password");
-      }
+  try {
+    const derivedKey =await pbkdf2(password, 'just a random string', 1, 32, 'sha512') 
+    const encryptedBytes = aes.utils.hex.toBytes(mnemonics);
+    const aesCtr = new aes.ModeOfOperation.ctr(
+      derivedKey,
+      new aes.Counter(5)
+    );
+    const decryptedBytes = aesCtr.decrypt(encryptedBytes);
+    const decryptedText = aes.utils.utf8.fromBytes(decryptedBytes); 
+    const regex = /^[A-Za-z]+(?:\s[A-Za-z]+)*$/;
+    if (!regex.test(decryptedText)) {
+      throw new Error();
     }
-  );
-};
+    return { ok: true, message: "Decryption successfull" }
+  } catch (error) {
+    return { ok: false, message: "Invalid password" }
+  }
+
+}
+
 
 // geting details of an account
 export const getDetails = async () => {
@@ -112,7 +92,11 @@ export const getDetails = async () => {
 export const transferEther = async (sendFrom, sendTo, amount) => {
   const transactionHistoryString = localStorage.getItem("transactionHistory");
   const transactionHistory = JSON.parse(transactionHistoryString);
-
+  const res = web3.utils.isAddress(sendTo);
+  
+  if(!res){
+    return { ok: false, message: "Invalid  address of reciever" }  // check if sendFrom is a valid address
+  }
   try {
     const tx = {
       from: sendFrom,
@@ -129,8 +113,9 @@ export const transferEther = async (sendFrom, sendTo, amount) => {
       { from, to, value: Web3.utils.fromWei(value, "ether") },
     ];
     localStorage.setItem("transactionHistory", JSON.stringify(txHistory));
+
+    return {ok:true, message: "Transaction successfully done"}
   } catch (error) {
-    console.log(error);
-    alert("Transaction denied");
+    return { ok: false, message: "Transaction denied becuase of wrong address" }
   }
 };

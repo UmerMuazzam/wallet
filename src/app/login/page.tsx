@@ -10,23 +10,25 @@ import React, { useState } from "react";
 
 const page = () => {
   const [password, setPassword] = useState("");
-  const [checkPass, setCheckPass] = useState(false);
+  const [checkPass, setCheckPass] = useState("");
   const router = useRouter();
   const mnemonics = localStorage.getItem("mnemonics");
 
   const handleDashboard = async () => {
-    try {
-      const res = await decryptMnemonics(
-        password,
-        mnemonics,
-        router,
-        setCheckPass,
-        "/dashboard"
-      );
-    } catch (error) {
-      console.log(error, "something went wrong");
-      setCheckPass(true);
+    if (password.length < 8 ) { 
+      setCheckPass("Password cannot be less than 8 characters")
+      return
     }
+      try {
+        const res = await decryptMnemonics(password, mnemonics);
+        if (!res.ok) {
+          setCheckPass(res.message);
+          return;
+        }
+        router.push(`/dashboard`);
+      } catch (error) {
+        console.log(error, "something went wrong");
+      }
   };
 
   return (
@@ -48,13 +50,13 @@ const page = () => {
       <div className="">
         <div className="flex flex-col gap-2 items-center">
           <input
-            type="text"
+            type="password"
             placeholder="Enter password"
             onChange={(e) => setPassword(e.target.value)}
             className="p-3 bg-white w-[70%] rounded-lg placeholder:text-blue-950 outline-none "
           />
           {/* error validation  */}
-          {checkPass && <Error> Password Not Correct</Error>}
+          {checkPass && <Error> {checkPass}</Error>}
 
           <button className="mt-4" onClick={handleDashboard}>
             <Button>Unlock</Button>
