@@ -11,8 +11,10 @@ const page = () => {
   const address = searchParams.get("address")
   return (
     <div>
-      <Logo />
-      <div className="max-w-[500px] bg-slate-50 mx-auto flex flex-col gap-6 p-4">
+      <div className='mb-20'>
+        <Logo />
+      </div>
+      <div className="container   bg-slate-50 mx-auto flex flex-col gap-6 p-4">
         <h3>Main Account</h3>
         <div className="">
           <QRCodeCanvas value={address} />

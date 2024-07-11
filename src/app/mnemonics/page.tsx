@@ -1,12 +1,15 @@
 "use client";
 
+import BackButton from "@/components/BackButton";
 import Button from "@/components/Button";
+import Loader from "@/components/Loader";
 import Logo from "@/components/Logo";
 import { createAccount, encryptMnemonics } from "@/utils/walletUtilities";
 import { useRouter, useSearchParams } from "next/navigation";
-import React from "react";
+import React, { useState } from "react";
 
 const page = () => {
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -14,14 +17,17 @@ const page = () => {
   const password = searchParams.get("password");
 
   const handleLogin = async () => {
+    setLoading(true)
     await encryptMnemonics(password, searchParams.get("mnemonics"));
     await createAccount(searchParams.get("mnemonics"));
-    router.push(`/walletCreated?mnemonics=${searchParams.get("mnemonics")}`);
-    // router.push(`/login?mnemonics=${searchParams.get("mnemonics")}`);
+    setTimeout(() => {
+      router.push(`/walletCreated?mnemonics=${searchParams.get("mnemonics")}`); 
+    }, 1000);
   };
 
   return (
-    <div className="container">
+    <div className="container relative">
+      <BackButton link="/create" />
       <Logo />
 
       <div>
@@ -47,6 +53,7 @@ const page = () => {
       <div className="text-center mt-16" onClick={handleLogin}>
         <Button>Continue</Button>
       </div>
+      {loading && <Loader />}
     </div>
   );
 };

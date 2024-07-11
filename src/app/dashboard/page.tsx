@@ -6,20 +6,24 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import Loader from "@/components/Loader";
 
 const page = () => {
   const isLogin = localStorage.getItem("password") || false;
   const transactionHistoryString = localStorage.getItem("transactionHistory");
   const transactionHistory = JSON.parse(transactionHistoryString);
 
+  const [loading, setLoading] = useState(false);
   const [accAddress, setAccAddress] = useState("");
   const [accBallance, setAccBallance] = useState("");
   const router = useRouter();
 
-  const handleLogout = (e) => {
-    localStorage.clear();
-    console.log("all clear");
-    router.push(`/`);
+  const handleLogout = (e) => { 
+    setLoading(true)
+    setTimeout(() => { 
+      localStorage.clear();
+      router.push(`/`);
+    }, 1000);
   };
 
   const getData = async () => {
@@ -29,10 +33,16 @@ const page = () => {
   };
 
   const handleSendTransaction = () => {
-    router.push(`/dashboard/transaction?ballance=${accBallance}`);
+    setLoading(true)
+    setTimeout(() => {
+      router.push(`/dashboard/transaction?ballance=${accBallance}`);
+    }, 1000);
   };
   const handleRecieve = () => {
-    router.push(`/dashboard/receive?address=${accAddress}`);
+      setLoading(true);
+      setTimeout(() => { 
+        router.push(`/dashboard/receive?address=${accAddress}`);
+      }, 1000);
   };
 
   useEffect(() => {
@@ -42,7 +52,8 @@ const page = () => {
   if (!isLogin) return router.push("/");
 
   return (
-    <div className="container  ">
+    <div className="container relative ">
+      
       <div className="flex  justify-between rounded-t-md items-center  m-auto p-4 bg-slate-50">
         <Link href="/">
           <Image src="/creata.svg" height={34} width={34} alt="Creata logo" />
@@ -55,7 +66,7 @@ const page = () => {
           <div>
             <MenuButton>
               <Image
-                className="w-9 h-9 cursor-pointer rounded-xl p-2 bg-white"
+                className="w-9 h-9 shadow-md cursor-pointer rounded-xl p-2 bg-white"
                 src="/account.svg"
                 width={10}
                 height={10}
@@ -123,34 +134,37 @@ const page = () => {
           </div>
         </div>
 
-        <div className="my-5">
-          <h2 className="text-[18px] font-semibold ">History </h2>
-          {transactionHistory?.map((item, i) => {
-            return (
-              <div key={i}>
-                <div className="flex flex-col    gap-2   my-6">
-                  <span className="text-gray-500 text-[14px]">
-                    <b>Sender</b> : {item.from}
-                  </span>
-                  <span className="text-gray-500 text-[14px]">
-                    <b>Reciever</b> : {item.to}
-                  </span>
-                  <span className="text-gray-500 text-[14px]">
-                    <b>Amount Send </b> : {item.value}
-                  </span>
-                  <span className="text-gray-500 text-[14px]">
-                    <b>Status</b> :{" "}
-                    <span className="rounded text-[12px] bg-green-400 px-2 py-1 text-white">
-                      Successfull
+        {transactionHistory.length > 0 && (
+          <div className="my-5">
+            <h2 className="text-[18px] font-semibold ">History </h2>
+            {transactionHistory?.map((item, i) => {
+              return (
+                <div key={i}>
+                  <div className="flex flex-col    gap-2   my-6">
+                    <span className="text-gray-500 text-[14px]">
+                      <b>Sender</b> : {item.from}
                     </span>
-                  </span>
+                    <span className="text-gray-500 text-[14px]">
+                      <b>Reciever</b> : {item.to}
+                    </span>
+                    <span className="text-gray-500 text-[14px]">
+                      <b>Amount Send </b> : {item.value}
+                    </span>
+                    <span className="text-gray-500 text-[14px]">
+                      <b>Status</b> :{" "}
+                      <span className="rounded text-[12px] bg-green-400 px-2 py-1 text-white">
+                        Successfull
+                      </span>
+                    </span>
+                  </div>
+                  <div className="h-[2px] bg-white w-[100%]"></div>
                 </div>
-                <div className="h-[2px] bg-white w-[100%]"></div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </div>
+      {loading && <Loader />}
     </div>
   );
 };

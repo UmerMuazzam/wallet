@@ -1,9 +1,12 @@
 "use client";
 
+import BackButton from "@/components/BackButton";
 import Button from "@/components/Button";
 import Error from "@/components/Error";
+import Loader from "@/components/Loader";
 import Logo from "@/components/Logo";
 import { decryptMnemonics, transferEther } from "@/utils/walletUtilities";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useState } from "react";
 
@@ -16,6 +19,7 @@ const page = () => {
 
   const router = useRouter();
   const [checkPass, setCheckPass] = useState(false);
+  const [loading, setLoading] = useState(false);
   const mnemonics = localStorage.getItem("mnemonics");
 
   const handleSubmit = async (formData) => {
@@ -47,7 +51,10 @@ const page = () => {
         setSendTo(transfer.message);
         return;
       }
-      router.push("/dashboard/transactionSuccessfull");
+      setLoading(true)
+      setTimeout(() => {
+        router.push("/dashboard/transactionSuccessfull");
+      }, 1000);
     } catch (error) {
       console.log(error, "something went wrong");
       setCheckPass(true);
@@ -55,7 +62,8 @@ const page = () => {
   };
 
   return (
-    <div className="container  text-center">
+    <div className="container relative text-center">
+      <BackButton link="/dashboard"/> 
       <div>
         <Logo />
         <h3 className="text-[18px] font-semibold my-8">
@@ -120,6 +128,7 @@ const page = () => {
           <Button>Send</Button>
         </form>
       </div>
+      {loading && <Loader />}
     </div>
   );
 };

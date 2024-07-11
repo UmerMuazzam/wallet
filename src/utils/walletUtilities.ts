@@ -17,6 +17,7 @@ export const generateMnemonics = (password) => {
 // function creating account from mnemonics
 export const createAccount = async (mns) => {
   localStorage.setItem("transactionHistory", JSON.stringify([]));
+  console.log("mnemonics",mns)
   const seed = await bip39.mnemonicToSeed(mns);
   const node = bip32.fromSeed(seed);
   const child = node.derivePath("m/44'/60'/0'/0/0");

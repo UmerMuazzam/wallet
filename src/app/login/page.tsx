@@ -2,6 +2,7 @@
 
 import Button from "@/components/Button";
 import Error from "@/components/Error";
+import Loader from "@/components/Loader";
 import Logo from "@/components/Logo";
 import { decryptMnemonics } from "@/utils/walletUtilities";
 import Image from "next/image";
@@ -9,6 +10,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import React, { useState } from "react";
 
 const page = () => {
+  const [loading, setLoading] = useState(false);
   const [password, setPassword] = useState("");
   const [checkPass, setCheckPass] = useState("");
   const router = useRouter();
@@ -26,14 +28,18 @@ const page = () => {
         return;
       }
       localStorage.setItem("password", password);
-      router.push(`/dashboard`);
+      setLoading(true);
+      setTimeout(() => {
+        router.push(`/dashboard`);
+      }, 1000);
+
     } catch (error) {
       console.log(error, "something went wrong");
     }
   };
 
   return (
-    <div className="container text-center">
+    <div className="container relative text-center">
       <Image
         className="mx-auto"
         src="/login.svg"
@@ -71,6 +77,7 @@ const page = () => {
           Check out Creata Chain Guides!
         </span>
       </div>
+      {loading && <Loader />}
     </div>
   );
 };

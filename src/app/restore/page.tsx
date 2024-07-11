@@ -5,10 +5,12 @@ import Error from "@/components/Error";
 import Logo from "@/components/Logo";
 import { createAccount, encryptMnemonics } from "@/utils/walletUtilities";
 import { useRouter } from "next/navigation";
-import React from "react";
+import React, { useState } from "react";
 
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
+import Loader from "@/components/Loader";
+import BackButton from "@/components/BackButton";
 
 const SignupSchema = Yup.object().shape({
   mnemonics: Yup.string()
@@ -26,9 +28,11 @@ const SignupSchema = Yup.object().shape({
 
 const page = () => {
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
   return (
-    <>
+    <div className="container relative">
+      <BackButton link="/" />
       <Logo />
       <Formik
         className="container text-center"
@@ -40,9 +44,13 @@ const page = () => {
         validationSchema={SignupSchema}
         onSubmit={async (values) => {
           console.log(values);
-          await createAccount(mnemonics);
-          await encryptMnemonics(password, mnemonics);
-          router.push("/dashboard");
+          await createAccount(values.mnemonics);
+          await encryptMnemonics(values.password, values.mnemonics);
+          localStorage.setItem("password", values.password);
+          setLoading(true);
+          setTimeout(() => {
+            router.push("/dashboard");
+          }, 1000);
         }}
       >
         {({ errors, touched }) => (
@@ -52,6 +60,7 @@ const page = () => {
                 marginBottom: "1rem",
                 fontSize: "1.3rem",
                 fontWeight: "500",
+                marginTop:".8rem"
               }}
             >
               Restore Wallet
@@ -103,7 +112,8 @@ const page = () => {
           </Form>
         )}
       </Formik>
-    </>
+      {loading && <Loader />}
+    </div>
   );
 };
 

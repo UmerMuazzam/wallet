@@ -5,7 +5,9 @@ import Error from "@/components/Error";
 import Logo from "@/components/Logo";
 import { generateMnemonics } from "@/utils/walletUtilities";
 import { useRouter } from "next/navigation";
-import React from "react";
+import React, { useState } from "react";
+import Loader from "@/components/Loader";
+import BackButton from "@/components/BackButton";
 
 // formik validation
 const SignupSchema = Yup.object().shape({
@@ -17,17 +19,17 @@ const SignupSchema = Yup.object().shape({
     .min(8, "Too Short!")
     .max(50, "Too Long!")
     .required("Required")
-    .oneOf([Yup.ref("password"), null], "Passwords must match"),
-  termCondition: Yup.boolean()
-    .required("Required")
-    .oneOf([true], "You must accept the Terms of Service to proceed"),
+    .oneOf([Yup.ref("password"), null], "Passwords must match"), 
 });
 
 const page = () => {
   const router = useRouter();
+  const [loading, setLoading] =useState(false);
+  console.log("loading", loading);
 
   return (
-    <div className="container">
+    <div className="container relative">
+      <BackButton link="/" />
       <div className="">
         <Logo />
       </div>
@@ -38,15 +40,16 @@ const page = () => {
         initialValues={{
           password: "",
           confirmPass: "",
-          termCondition: false,
         }}
         validationSchema={SignupSchema}
         onSubmit={(values) => {
-          console.log(values);
-          const res = generateMnemonics(values.password);
-          router.push(
-            `/mnemonics?mnemonics=${res}&password=${values.password}`
-          );
+          setLoading(true);
+          setTimeout(() => {
+            const res = generateMnemonics(values.password);
+            router.push(
+              `/mnemonics?mnemonics=${res}&password=${values.password}`
+            );
+          }, 1000);
         }}
       >
         {({ errors, touched }) => (
@@ -86,9 +89,6 @@ const page = () => {
               />{" "}
               I have read all the Terms and Conditions
             </div>
-            {errors.termCondition && touched.termCondition ? (
-              <Error>{errors.termCondition}</Error>
-            ) : null}
 
             <button
               type="submit"
@@ -102,6 +102,8 @@ const page = () => {
           </Form>
         )}
       </Formik>
+
+      {loading && <Loader />}
     </div>
   );
 };
