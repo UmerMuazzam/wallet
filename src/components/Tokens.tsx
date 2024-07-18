@@ -14,7 +14,7 @@ const Tokens = () => {
     };
     const handleTokenAddress = () => {
         try {
-            myContract(abi, tokenAddress);
+           const { name, symbol, totalSupply } = myContract(abi, tokenAddress);
         } catch (error) {
             console.log("some thing went wrong",error)
         }

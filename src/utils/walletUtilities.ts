@@ -140,10 +140,10 @@ export const myContract = async(abi, deployedAddress)=>{
     const myContract = new web3.eth.Contract(abi, deployedAddress);
     const name = await myContract.methods.name().call()
     const symbol = await myContract.methods.symbol().call()
-    const totalSupply = await myContract.methods.totalSupply().call()
+    const totalSupply =  web3.utils.fromWei(await myContract.methods.totalSupply().call() , "ether")
     console.log("name : ", name, "symbol", symbol, "totalSupply", totalSupply)
-    
-    
+
+    return {name,symbol,totalSupply}
   } catch (error) {
     console.log(error)
   }
