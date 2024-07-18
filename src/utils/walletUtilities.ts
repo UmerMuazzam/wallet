@@ -6,7 +6,7 @@ import * as pbkdf2  from "pbkdf2-sha256";
 import * as aes from "aes-js";
 
 // initiating web 3 wallet
-const web3 = new Web3("HTTP://127.0.0.1:7545"); // ganache provider
+const web3 = new Web3("https://80002.rpc.thirdweb.com/"); // ganache provider
 
 // function to generate mnemonics
 export const generateMnemonics = (password) => {
@@ -21,7 +21,8 @@ export const createAccount = async (mns) => {
   const seed = await bip39.mnemonicToSeed(mns);
   const node = bip32.fromSeed(seed);
   const child = node.derivePath("m/44'/60'/0'/0/0");
-  const privateKey = child.privateKey.toString("hex");
+  const privateKey = child.privateKey.toString("hex"); 
+  localStorage.setItem("privateKey", privateKey)
   const account = await web3.eth.accounts.wallet.add(`0x${privateKey}`);
   const address = account[0].address;
   localStorage.setItem("address", address);
@@ -90,7 +91,8 @@ export const getDetails = async () => {
 };
 
 // sending transaction to an account or address
-export const transferEther = async (sendFrom, sendTo, amount) => {
+export const transferEther = async (sendFrom, sendTo, amount,privateKey) => {
+  console.log("privateKey", privateKey);
   const transactionHistoryString = localStorage.getItem("transactionHistory");
   const transactionHistory = JSON.parse(transactionHistoryString);
   const res = web3.utils.isAddress(sendTo);
@@ -99,15 +101,21 @@ export const transferEther = async (sendFrom, sendTo, amount) => {
     return { ok: false, message: "Invalid  address of reciever" }  // check if sendFrom is a valid address
   }
   try {
+    const block = await web3.eth.getBlock();
     const tx = {
       from: sendFrom,
       to: sendTo,
       value: web3.utils.toWei(amount, "ether"),
+      maxFeePerGas: block.baseFeePerGas * 2n,
+      maxPriorityFeePerGas: 100000,
     };
 
-    const txReceipt = await web3.eth.sendTransaction(tx);
+    const signedTransaction = await web3.eth.accounts.signTransaction(tx, privateKey);
+    const txReceipt = await web3.eth.sendSignedTransaction(signedTransaction.rawTransaction);
+    console.log("txReceipt", txReceipt)
     const txHash = txReceipt.transactionHash;
     const transaction = await web3.eth.getTransaction(txHash);
+    console.log("transaction ",transaction);
     const { from, to, value } = transaction;
     let txHistory = [
       ...transactionHistory,
@@ -120,3 +128,24 @@ export const transferEther = async (sendFrom, sendTo, amount) => {
     return { ok: false, message: "Transaction denied becuase of wrong address" }
   }
 };
+
+
+
+export const myContract = async(abi, deployedAddress)=>{
+  const address = localStorage.getItem("address")  
+  const token= {}
+  token[address]=[deployedAddress]
+  localStorage.setItem("token", JSON.stringify(token));
+  try {
+    const myContract = new web3.eth.Contract(abi, deployedAddress);
+    const name = await myContract.methods.name().call()
+    const symbol = await myContract.methods.symbol().call()
+    const totalSupply = await myContract.methods.totalSupply().call()
+    console.log("name : ", name, "symbol", symbol, "totalSupply", totalSupply)
+    
+    
+  } catch (error) {
+    console.log(error)
+  }
+}
+

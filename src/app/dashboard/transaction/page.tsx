@@ -10,6 +10,8 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useState } from "react";
 
+const privateKey= localStorage.getItem("privateKey");
+
 const page = () => {
   const [sendTo, setSendTo] = useState(false);
   const [amount, setAmount] = useState(0);
@@ -40,11 +42,14 @@ const page = () => {
         setCheckPass(true);
         return;
       }
+
+     
       // calling transfer ether function
       const transfer = await transferEther(
         myAdd,
         recieverAdd,
-        formData.get("amount")
+        formData.get("amount"),
+        privateKey
       );
 
       if (!transfer.ok) {

@@ -1,18 +1,22 @@
 "use client";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
-import { ChevronDownIcon } from "@heroicons/react/20/solid";
+ 
 import { getDetails } from "@/utils/walletUtilities";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Loader from "@/components/Loader";
+import History from "@/components/History";
+import Tokens from "@/components/Tokens";
 
 const page = () => {
   const isLogin = localStorage.getItem("password") || false;
   const transactionHistoryString = localStorage.getItem("transactionHistory");
   const transactionHistory = JSON.parse(transactionHistoryString);
 
+  const [showHistory, setShowHistory] = useState(false);
+  const [showTokens, setShowTokens] = useState(false);
   const [loading, setLoading] = useState(false);
   const [accAddress, setAccAddress] = useState("");
   const [accBallance, setAccBallance] = useState("");
@@ -45,6 +49,15 @@ const page = () => {
       }, 1000);
   };
 
+  const handleShowHistory=()=>{
+    setShowHistory(true)
+    setShowTokens(false)
+  }
+  const handleShowTokens = () => {
+    setShowHistory(false);
+    setShowTokens(true);
+  };
+
   useEffect(() => {
     getData();
   }, [accAddress]);
@@ -53,7 +66,6 @@ const page = () => {
 
   return (
     <div className="container relative ">
-      
       <div className="flex  justify-between rounded-t-md items-center  m-auto p-4 bg-slate-50">
         <Link href="/">
           <Image src="/creata.svg" height={34} width={34} alt="Creata logo" />
@@ -134,35 +146,22 @@ const page = () => {
           </div>
         </div>
 
-        {transactionHistory.length > 0 && (
-          <div className="my-5">
-            <h2 className="text-[18px] font-semibold ">History </h2>
-            {transactionHistory?.map((item, i) => {
-              return (
-                <div key={i}>
-                  <div className="flex flex-col    gap-2   my-6">
-                    <span className="text-gray-500 text-[14px]">
-                      <b>Sender</b> : {item.from}
-                    </span>
-                    <span className="text-gray-500 text-[14px]">
-                      <b>Reciever</b> : {item.to}
-                    </span>
-                    <span className="text-gray-500 text-[14px]">
-                      <b>Amount Send </b> : {item.value}
-                    </span>
-                    <span className="text-gray-500 text-[14px]">
-                      <b>Status</b> :{" "}
-                      <span className="rounded text-[12px] bg-green-400 px-2 py-1 text-white">
-                        Successfull
-                      </span>
-                    </span>
-                  </div>
-                  <div className="h-[2px] bg-white w-[100%]"></div>
-                </div>
-              );
-            })}
-          </div>
-        )}
+        <div className="flex justify-between">
+          <h2
+            className="text-[18px] font-semibold mt-6 inline-block cursor-pointer"
+            onClick={handleShowHistory}
+          >
+            History
+          </h2>
+          <h2
+            className="text-[18px] font-semibold mt-6 cursor-pointer"
+            onClick={handleShowTokens}
+          >
+            Tokens{" "}
+          </h2>
+        </div>
+        {showHistory && <History transactionHistory={transactionHistory} />}
+        {showTokens && <Tokens />}
       </div>
       {loading && <Loader />}
     </div>
