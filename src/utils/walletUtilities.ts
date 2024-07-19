@@ -6,7 +6,7 @@ import * as pbkdf2  from "pbkdf2-sha256";
 import * as aes from "aes-js";
 
 // initiating web 3 wallet
-const web3 = new Web3("https://80002.rpc.thirdweb.com/"); // ganache provider
+export const web3 = new Web3("https://80002.rpc.thirdweb.com/"); // ganache provider
 
 // function to generate mnemonics
 export const generateMnemonics = (password) => {
@@ -131,21 +131,47 @@ export const transferEther = async (sendFrom, sendTo, amount,privateKey) => {
 
 
 
-export const myContract = async(abi, deployedAddress)=>{
-  const address = localStorage.getItem("address")  
-  const token= {}
-  token[address]=[deployedAddress]
-  localStorage.setItem("token", JSON.stringify(token));
+// export const myContract = async( deployedAddress)=>{ 
+ 
+//   const accountAddress = localStorage.getItem("address");
+//   const tokens ={ }
+//   tokens[accountAddress] = [{ "deployedAddress": deployedAddress }]
+//   localStorage.setItem("tokensAddress", JSON.stringify(tokens));
+  
+// }
+
+export const myContract = async (deployedAddress) => {
+  const accountAddress = localStorage.getItem("address");
+
+  // Fetch existing tokens from localStorage
+  let tokens = JSON.parse(localStorage.getItem("tokensAddress")) || {};
+
+  // Check if tokens already exist for the accountAddress
+  if (tokens.hasOwnProperty(accountAddress)) {
+    // Add the new deployedAddress to the existing array
+    tokens[accountAddress].push({ "deployedAddress": deployedAddress });
+  } else {
+    // Initialize a new array with the deployedAddress
+    tokens[accountAddress] = [{ "deployedAddress": deployedAddress }];
+  }
+
+  // Store updated tokens back into localStorage
+  localStorage.setItem("tokensAddress", JSON.stringify(tokens));
+};
+
+
+
+
+
+
+export const getTokenDetails= async(abi,deployedAddress)=>{
   try {
     const myContract = new web3.eth.Contract(abi, deployedAddress);
     const name = await myContract.methods.name().call()
     const symbol = await myContract.methods.symbol().call()
-    const totalSupply =  web3.utils.fromWei(await myContract.methods.totalSupply().call() , "ether")
-    console.log("name : ", name, "symbol", symbol, "totalSupply", totalSupply)
-
-    return {name,symbol,totalSupply}
-  } catch (error) {
-    console.log(error)
+    const totalSupply = web3.utils.fromWei(await myContract.methods.totalSupply().call(), "ether") 
+    return { name, symbol, totalSupply }
+  } catch (error) { 
+    return ({error:'Wrong Contract address'})
   }
 }
-
