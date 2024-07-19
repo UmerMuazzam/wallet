@@ -170,7 +170,7 @@ export const getTokenDetails= async(abi,deployedAddress)=>{
     const name = await myContract.methods.name().call()
     const symbol = await myContract.methods.symbol().call()
     const totalSupply = web3.utils.fromWei(await myContract.methods.totalSupply().call(), "ether") 
-    return { name, symbol, totalSupply }
+    return { name, symbol, totalSupply, deployedAddress }
   } catch (error) { 
     return ({error:'Wrong Contract address'})
   }
