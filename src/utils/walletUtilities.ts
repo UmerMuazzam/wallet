@@ -1,7 +1,7 @@
 import * as bip39 from "bip39";
 import * as bip32 from "bip32";
 import { Web3 } from "web3";
-import * as pbkdf2  from "pbkdf2-sha256";
+import * as pbkdf2 from "pbkdf2-sha256";
 
 import * as aes from "aes-js";
 
@@ -17,12 +17,12 @@ export const generateMnemonics = (password) => {
 // function creating account from mnemonics
 export const createAccount = async (mns) => {
   localStorage.setItem("transactionHistory", JSON.stringify([]));
-  console.log("mnemonics",mns)
+  console.log("mnemonics", mns);
   const seed = await bip39.mnemonicToSeed(mns);
   const node = bip32.fromSeed(seed);
   const child = node.derivePath("m/44'/60'/0'/0/0");
-  const privateKey = child.privateKey.toString("hex"); 
-  localStorage.setItem("privateKey", privateKey)
+  const privateKey = child.privateKey.toString("hex");
+  localStorage.setItem("privateKey", privateKey);
   const account = await web3.eth.accounts.wallet.add(`0x${privateKey}`);
   const address = account[0].address;
   localStorage.setItem("address", address);
@@ -34,51 +34,50 @@ export const createAccount = async (mns) => {
 };
 // mnemonics encryption
 export const encryptMnemonics = async (password, mnemo) => {
-  console.log(password,mnemo)
-    
+  console.log(password, mnemo);
+
   try {
-    const derivedKey = await pbkdf2(password, 'just a random string', 1, 32, 'sha512') 
-    const textBytes = aes.utils.utf8.toBytes(mnemo);
-    const aesCtr = new aes.ModeOfOperation.ctr(
-      derivedKey,
-      new aes.Counter(5)
+    const derivedKey = await pbkdf2(
+      password,
+      "just a random string",
+      1,
+      32,
+      "sha512"
     );
+    const textBytes = aes.utils.utf8.toBytes(mnemo);
+    const aesCtr = new aes.ModeOfOperation.ctr(derivedKey, new aes.Counter(5));
     const encryptedBytes = aesCtr.encrypt(textBytes);
     const encryptedHex = aes.utils.hex.fromBytes(encryptedBytes);
 
     localStorage.setItem("mnemonics", encryptedHex);
   } catch (error) {
-    console.log("Error while encrypting")
+    console.log("Error while encrypting");
   }
-    
 };
 
 //  function to decrypt mnemonics
-export const decryptMnemonics = async(
-  password,
-  mnemonics
-) => { 
-
+export const decryptMnemonics = async (password, mnemonics) => {
   try {
-    const derivedKey =await pbkdf2(password, 'just a random string', 1, 32, 'sha512') 
-    const encryptedBytes = aes.utils.hex.toBytes(mnemonics);
-    const aesCtr = new aes.ModeOfOperation.ctr(
-      derivedKey,
-      new aes.Counter(5)
+    const derivedKey = await pbkdf2(
+      password,
+      "just a random string",
+      1,
+      32,
+      "sha512"
     );
+    const encryptedBytes = aes.utils.hex.toBytes(mnemonics);
+    const aesCtr = new aes.ModeOfOperation.ctr(derivedKey, new aes.Counter(5));
     const decryptedBytes = aesCtr.decrypt(encryptedBytes);
-    const decryptedText = aes.utils.utf8.fromBytes(decryptedBytes); 
+    const decryptedText = aes.utils.utf8.fromBytes(decryptedBytes);
     const regex = /^[A-Za-z]+(?:\s[A-Za-z]+)*$/;
     if (!regex.test(decryptedText)) {
       throw new Error();
     }
-    return { ok: true, message: "Decryption successfull" }
+    return { ok: true, message: "Decryption successfull" };
   } catch (error) {
-    return { ok: false, message: "Invalid password" }
+    return { ok: false, message: "Invalid password" };
   }
-
-}
-
+};
 
 // geting details of an account
 export const getDetails = async () => {
@@ -91,14 +90,14 @@ export const getDetails = async () => {
 };
 
 // sending transaction to an account or address
-export const transferEther = async (sendFrom, sendTo, amount,privateKey) => {
+export const transferEther = async (sendFrom, sendTo, amount, privateKey) => {
   console.log("privateKey", privateKey);
   const transactionHistoryString = localStorage.getItem("transactionHistory");
   const transactionHistory = JSON.parse(transactionHistoryString);
   const res = web3.utils.isAddress(sendTo);
-  
-  if(!res){
-    return { ok: false, message: "Invalid  address of reciever" }  // check if sendFrom is a valid address
+
+  if (!res) {
+    return { ok: false, message: "Invalid  address of reciever" }; // check if sendFrom is a valid address
   }
   try {
     const block = await web3.eth.getBlock();
@@ -110,12 +109,17 @@ export const transferEther = async (sendFrom, sendTo, amount,privateKey) => {
       maxPriorityFeePerGas: 100000,
     };
 
-    const signedTransaction = await web3.eth.accounts.signTransaction(tx, privateKey);
-    const txReceipt = await web3.eth.sendSignedTransaction(signedTransaction.rawTransaction);
-    console.log("txReceipt", txReceipt)
+    const signedTransaction = await web3.eth.accounts.signTransaction(
+      tx,
+      privateKey
+    );
+    const txReceipt = await web3.eth.sendSignedTransaction(
+      signedTransaction.rawTransaction
+    );
+    console.log("txReceipt", txReceipt);
     const txHash = txReceipt.transactionHash;
     const transaction = await web3.eth.getTransaction(txHash);
-    console.log("transaction ",transaction);
+    console.log("transaction ", transaction);
     const { from, to, value } = transaction;
     let txHistory = [
       ...transactionHistory,
@@ -123,21 +127,22 @@ export const transferEther = async (sendFrom, sendTo, amount,privateKey) => {
     ];
     localStorage.setItem("transactionHistory", JSON.stringify(txHistory));
 
-    return {ok:true, message: "Transaction successfully done"}
+    return { ok: true, message: "Transaction successfully done" };
   } catch (error) {
-    return { ok: false, message: "Transaction denied becuase of wrong address" }
+    return {
+      ok: false,
+      message: "Transaction denied becuase of wrong address",
+    };
   }
 };
 
+// export const myContract = async( deployedAddress)=>{
 
-
-// export const myContract = async( deployedAddress)=>{ 
- 
 //   const accountAddress = localStorage.getItem("address");
 //   const tokens ={ }
 //   tokens[accountAddress] = [{ "deployedAddress": deployedAddress }]
 //   localStorage.setItem("tokensAddress", JSON.stringify(tokens));
-  
+
 // }
 
 export const myContract = async (deployedAddress) => {
@@ -149,29 +154,27 @@ export const myContract = async (deployedAddress) => {
   // Check if tokens already exist for the accountAddress
   if (tokens.hasOwnProperty(accountAddress)) {
     // Add the new deployedAddress to the existing array
-    tokens[accountAddress].push({ "deployedAddress": deployedAddress });
+    tokens[accountAddress].push({ deployedAddress: deployedAddress });
   } else {
     // Initialize a new array with the deployedAddress
-    tokens[accountAddress] = [{ "deployedAddress": deployedAddress }];
+    tokens[accountAddress] = [{ deployedAddress: deployedAddress }];
   }
 
   // Store updated tokens back into localStorage
   localStorage.setItem("tokensAddress", JSON.stringify(tokens));
 };
 
-
-
-
-
-
-export const getTokenDetails= async(abi,deployedAddress)=>{
+export const getTokenDetails = async (abi, deployedAddress) => {
   try {
     const myContract = new web3.eth.Contract(abi, deployedAddress);
-    const name = await myContract.methods.name().call()
-    const symbol = await myContract.methods.symbol().call()
-    const totalSupply = web3.utils.fromWei(await myContract.methods.totalSupply().call(), "ether") 
-    return { name, symbol, totalSupply, deployedAddress }
-  } catch (error) { 
-    return ({error:'Wrong Contract address'})
+    const name = await myContract.methods.name().call();
+    const symbol = await myContract.methods.symbol().call();
+    const totalSupply = web3.utils.fromWei(
+      await myContract.methods.totalSupply().call(),
+      "ether"
+    );
+    return { name, symbol, totalSupply, deployedAddress };
+  } catch (error) {
+    return { error: "Wrong Contract address" };
   }
-}
+};
