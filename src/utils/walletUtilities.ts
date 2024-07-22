@@ -2,8 +2,10 @@ import * as bip39 from "bip39";
 import * as bip32 from "bip32";
 import { Web3 } from "web3";
 import * as pbkdf2 from "pbkdf2-sha256";
-
+import { abi } from "./abi";
 import * as aes from "aes-js";
+
+const privateKey = localStorage.getItem("privateKey");
 
 // initiating web 3 wallet
 export const web3 = new Web3("https://80002.rpc.thirdweb.com/"); // ganache provider
@@ -178,3 +180,51 @@ export const getTokenDetails = async (abi, deployedAddress) => {
     return { error: "Wrong Contract address" };
   }
 };
+
+export const sendToken = async (abi) => {
+  const tokenAddress = "0x50349E6a9C32F5Ba78E0B0ec0289e79CbA377823"; // deployed token address
+  const toAddress = "0xFbc02E60462D06f3c575780c37CE8758Ce07E8A9"; // receiver of the token
+
+  // Creating a signing account from a private key
+  const signer = web3.eth.accounts.privateKeyToAccount(`0x${privateKey}`);
+  web3.eth.accounts.wallet.add(signer);
+
+  const contract = new web3.eth.Contract(abi, tokenAddress, {
+    from: signer.address,
+  });
+  let amount = web3.utils.toHex(web3.utils.toWei("1", "ether"));
+
+  // Fetching the nonce and gas price
+  const nonce = await web3.eth.getTransactionCount(signer.address, "pending");
+  const gasPrice = await web3.eth.getGasPrice();
+
+  // Creating the transaction object
+  const tx = {
+    from: signer.address,
+    to: tokenAddress, // deployed token address
+    data: contract.methods.transfer(toAddress, amount).encodeABI(),
+    gas: web3.utils.toHex(5000000),
+    gasPrice: web3.utils.toHex(gasPrice),
+    nonce: web3.utils.toHex(nonce),
+  };
+
+  const signedTx = await web3.eth.accounts.signTransaction(
+    tx,
+    signer.privateKey
+  );
+  console.log("Raw transaction data: " + signedTx.rawTransaction);
+
+  // Sending the transaction to the network
+  const receipt = await web3.eth
+    .sendSignedTransaction(signedTx.rawTransaction)
+    .once("transactionHash", (txhash) => {
+      console.log(`Mining transaction ...`);
+      console.log(txhash);
+    });
+  // The transaction is now on chain!
+  console.log(`Mined in block ${receipt.blockNumber}`);
+};
+
+setTimeout(() => {
+  sendToken(abi);
+}, 2000);
