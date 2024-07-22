@@ -9,11 +9,11 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
+const address= localStorage.getItem("address");
 const page = () => {
   const [detail, setDetail] = useState("");
   const router = useRouter();
-  const { tokenDetails } = useParams();
-  console.log("detail", detail);
+  const { tokenDetails } = useParams(); 
 
   const handleSendNavigate = () => {
     router.push(
@@ -22,7 +22,7 @@ const page = () => {
   };
 
   async function getData() {
-    let res = await getTokenDetails(abi, tokenDetails);
+    let res = await getTokenDetails(abi, tokenDetails,address);
     setDetail(res);
   }
   useEffect(() => {
@@ -78,7 +78,7 @@ const page = () => {
         <div className="flex flex-col pt-24 items-center gap-4">
           <div className="text-xl font-semibold">
             {" "}
-            {detail.totalSupply} {detail.symbol}{" "}
+            {detail.balance} {detail.symbol}{" "}
           </div>
 
           <Image

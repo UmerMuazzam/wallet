@@ -1,32 +1,51 @@
 "use client";
 
 import { abi } from "@/utils/abi";
-import { getTokenDetails, myContract, web3 } from "@/utils/walletUtilities";
-import Image from "next/image";
+import { getTokenDetails, myContract, web3 } from "@/utils/walletUtilities"; 
 import React, { useEffect, useState } from "react";
 import Error from "./Error";
 import TokensList from "./TokensList";
+import Link from "next/link"; 
+import Loader from "./Loader";
 
 const address = localStorage.getItem("address");
 console.log("address", address);
 
 const Tokens = () => {
+
   const [contractDetails, setContractDetails] = useState([]);
-  const [error, setError] = useState("");
-  console.log("contractDetails", contractDetails);
+   
+  const [error, setError] = useState(""); 
+  const [loading, setLoading] = useState(false); 
 
   const [showInputField, setShowInputField] = useState(false);
   const [tokenAddress, setTokenAddress] = useState("");
 
+  // to show the input field
   const handleShowInputToken = () => {
     setShowInputField(true);
   };
+
+
+  // add the token to the list of tokens
   const handleTokenAddress = async () => {
+    setLoading(true)
+
+    setError("")
+    const res = await getTokenDetails(abi, tokenAddress, address);
+    if(res.error){
+      console.error("Token addressis not valid ")
+      setError("Token address is not valid")
+      setLoading(false);
+      return;
+    }
     setTokenAddress("");
     try {
       await myContract(tokenAddress);
-
-      myTokenGetDetails();
+      setTimeout(() => {
+        myTokenGetDetails();
+        setLoading(false);
+      }, 1000);
     } catch (error) {
       console.log("some thing went wrong", error);
     }
@@ -35,15 +54,13 @@ const Tokens = () => {
   async function myTokenGetDetails() {
     try {
       let tokensAddress = JSON.parse(localStorage.getItem("tokensAddress"));
-      tokensAddress = tokensAddress[address];
-      console.log("tokensAddress", tokensAddress);
+      tokensAddress = tokensAddress[address]; 
 
       const response = tokensAddress.map((element) =>
-        getTokenDetails(abi, element.deployedAddress)
+        getTokenDetails(abi, element.deployedAddress,address)
       );
       const promise = await Promise.all(response);
-      console.log(promise);
-
+      
       setContractDetails(promise);
     } catch (error) {
       console.log(error);
@@ -82,6 +99,14 @@ const Tokens = () => {
       )}
 
       <TokensList contractDetails={contractDetails} />
+
+      <Link href="/dashboard/sendTokenDetails">
+        <div className="text-[14px] text-blue font-semibold text-right cursor-pointer mt-4">
+          Token Transaction
+        </div>
+      </Link>
+
+     {loading && <Loader/>}
     </div>
   );
 };

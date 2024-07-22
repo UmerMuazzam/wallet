@@ -7,18 +7,9 @@ import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
-const transactionHistory = [
-  { from: "k234q3e", to: "9989asdfasdf", value: 9 },
-  { from: "bxcb45", to: "ghsdfgsfgas", value: 66 },
-  { from: "jgf5634", to: "67dhsdfg", value: 5 },
-  { from: "xdfsdfs", to: "89hdfgh", value: 1 },
-];
 
-const page = () => {
-  // const gasPrice = await web3.eth.getGasPrice();
-  //   const gasLimit = await contract.methods
-  //     .transfer(receiverAddress, amount.toString())
-  //     .estimateGas({ from: address });
+const page = () => { 
+  const transactionHistory = JSON.parse(localStorage.getItem("tokenTxHistory")) || [];
 
   return (
     <div className="container relative ">
@@ -66,7 +57,7 @@ const page = () => {
       <div className=" relative bg-slate-50 py-16 pl-16">
         <BackButton link={"/dashboard"}>Back</BackButton>
 
-        <History transactionHistory={transactionHistory} />
+        <History value="Transaction Hash" transactionHistory={transactionHistory} />
       </div>
     </div>
   );

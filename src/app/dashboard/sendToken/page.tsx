@@ -2,23 +2,63 @@
 
 import BackButton from "@/components/BackButton";
 import Button from "@/components/Button";
+import Error from "@/components/Error";
+import { abi } from "@/utils/abi";
+import { sendToken, web3 } from "@/utils/walletUtilities";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import React from "react";
+import React, { useState } from "react";
 
+
+const privateKey = localStorage.getItem("privateKey");
+const address = localStorage.getItem("address");
+const password = localStorage.getItem("password");
 const page = () => {
+  const tokenTxHistory = JSON.parse(localStorage.getItem("tokenTxHistory")) || [];
   const searchParams = useSearchParams();
+  const [sendTokenAddress,setSendTokenAddress]=useState("")
+  const [error, setError] = useState("");
+  const [amount, setAmount] = useState(0);
+  const [enteredPass, setEnteredPass] = useState('');
 
   const name = searchParams.get("name");
   const totalSupply = searchParams.get("totalSupply");
   const deployedAddress = searchParams.get("deployedAddress");
+  console.log("deployedAddress: " + deployedAddress)
 
-  // const gasPrice = await web3.eth.getGasPrice();
-  //   const gasLimit = await contract.methods
-  //     .transfer(receiverAddress, amount.toString())
-  //     .estimateGas({ from: address });
+
+
+
+  const handleSendToken= async()=>{
+    if (password != enteredPass) {
+      setError("Incorrect password");
+      return;
+    }
+    if (!(web3.utils.isAddress(sendTokenAddress))){
+      setError("Invalid reciever address")
+      return;
+    }
+
+
+
+      try {
+        const res = await sendToken(
+          abi,
+          address,
+          `0x${privateKey}`,
+          deployedAddress,
+          sendTokenAddress,
+          amount
+        );
+        console.log("res", res);
+        tokenTxHistory.push(res);
+        localStorage.setItem("tokenTxHistory", JSON.stringify(tokenTxHistory));
+      } catch (error) {
+        console.log(error);
+      }
+  }
 
   return (
     <div className="container relative ">
@@ -67,23 +107,33 @@ const page = () => {
         <BackButton link={"/dashboard"}>Back</BackButton>
 
         <div className=" py-24 ">
-          <form className="flex flex-col items-center gap-4 ">
+          <form
+            className="flex flex-col items-center gap-4 "
+            action={handleSendToken}
+          >
             <span className="font-semibold text-[17px]">Send to</span>
             <input
+              value={sendTokenAddress}
               className="w-[75%] bg-white  border py-2 px-4 rounded-lg outline-none"
               type="text"
               placeholder="Enter public address (0x) or Ens name"
+              onChange={(e) => setSendTokenAddress(e.target.value)}
             />
             <input
+              value={enteredPass}
               className="w-[75%] bg-white  border py-2 px-4 rounded-lg outline-none"
               type="password"
               placeholder="Enter your password"
+              onChange={(e) => setEnteredPass(e.target.value)}
             />
             <input
+              value={amount}
               className="w-[75%] bg-white  border py-2 px-4 rounded-lg outline-none"
               type="text"
               placeholder="Enter amount to send"
+              onChange={(e) => setAmount(Number(e.target.value))}
             />
+            <div>{error && <Error>{error}</Error>}</div>
             <Button>Send</Button>
           </form>
         </div>

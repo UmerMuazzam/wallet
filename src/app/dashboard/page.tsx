@@ -25,7 +25,7 @@ const page = () => {
   const handleLogout = (e) => { 
     setLoading(true)
     setTimeout(() => { 
-      localStorage.clear();
+      localStorage.removeItem("password");
       router.push(`/`);
     }, 1000);
   };
@@ -160,7 +160,12 @@ const page = () => {
             Tokens{" "}
           </h2>
         </div>
-        {showHistory && <History transactionHistory={transactionHistory} />}
+        {showHistory && (
+          <History
+            value="Amount Send"
+            transactionHistory={transactionHistory}
+          />
+        )}
         {showTokens && <Tokens />}
       </div>
       {loading && <Loader />}

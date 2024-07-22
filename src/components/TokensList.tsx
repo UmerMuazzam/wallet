@@ -22,7 +22,7 @@ const TokensList = ({ contractDetails }) => {
           </div>
           <div>
             <div>{item?.name}</div>
-            <div className="text-blue">{item?.totalSupply} CTA</div>
+            <div className="text-blue">{item?.balance} CTA</div>
           </div>
         </Link>
       ))}

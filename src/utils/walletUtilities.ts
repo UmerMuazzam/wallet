@@ -1,14 +1,14 @@
 import * as bip39 from "bip39";
 import * as bip32 from "bip32";
 import { Web3 } from "web3";
-import * as pbkdf2 from "pbkdf2-sha256";
-import { abi } from "./abi";
+import * as pbkdf2 from "pbkdf2-sha256"; 
 import * as aes from "aes-js";
 
-const privateKey = localStorage.getItem("privateKey");
+
 
 // initiating web 3 wallet
-export const web3 = new Web3("https://80002.rpc.thirdweb.com/"); // ganache provider
+export const web3 = new Web3("https://80002.rpc.thirdweb.com/"); 
+// export const web3 = new Web3("HTTP://127.0.0.1:7545"); // ganache provider
 
 // function to generate mnemonics
 export const generateMnemonics = (password) => {
@@ -138,14 +138,7 @@ export const transferEther = async (sendFrom, sendTo, amount, privateKey) => {
   }
 };
 
-// export const myContract = async( deployedAddress)=>{
-
-//   const accountAddress = localStorage.getItem("address");
-//   const tokens ={ }
-//   tokens[accountAddress] = [{ "deployedAddress": deployedAddress }]
-//   localStorage.setItem("tokensAddress", JSON.stringify(tokens));
-
-// }
+ 
 
 export const myContract = async (deployedAddress) => {
   const accountAddress = localStorage.getItem("address");
@@ -166,7 +159,7 @@ export const myContract = async (deployedAddress) => {
   localStorage.setItem("tokensAddress", JSON.stringify(tokens));
 };
 
-export const getTokenDetails = async (abi, deployedAddress) => {
+export const getTokenDetails = async (abi, deployedAddress, address) => {
   try {
     const myContract = new web3.eth.Contract(abi, deployedAddress);
     const name = await myContract.methods.name().call();
@@ -175,56 +168,53 @@ export const getTokenDetails = async (abi, deployedAddress) => {
       await myContract.methods.totalSupply().call(),
       "ether"
     );
-    return { name, symbol, totalSupply, deployedAddress };
+    const balance = web3.utils.fromWei(await myContract.methods.balanceOf(address).call(),'ether')
+    
+    return { name, symbol, totalSupply, deployedAddress, balance };
   } catch (error) {
     return { error: "Wrong Contract address" };
   }
 };
 
-export const sendToken = async (abi) => {
-  const tokenAddress = "0x50349E6a9C32F5Ba78E0B0ec0289e79CbA377823"; // deployed token address
-  const toAddress = "0xFbc02E60462D06f3c575780c37CE8758Ce07E8A9"; // receiver of the token
 
-  // Creating a signing account from a private key
-  const signer = web3.eth.accounts.privateKeyToAccount(`0x${privateKey}`);
-  web3.eth.accounts.wallet.add(signer);
+ 
 
-  const contract = new web3.eth.Contract(abi, tokenAddress, {
-    from: signer.address,
-  });
-  let amount = web3.utils.toHex(web3.utils.toWei("1", "ether"));
 
-  // Fetching the nonce and gas price
-  const nonce = await web3.eth.getTransactionCount(signer.address, "pending");
-  const gasPrice = await web3.eth.getGasPrice();
 
-  // Creating the transaction object
+export const sendToken = async (abi, address, privateKey, deployedAddress, toAddress, amu) => {
+  // console.log("abi ", abi, "address", address, " privateKey", privateKey, " deployedAddress", deployedAddress, " toAddress", toAddress," amu", amu);
+
+  const contract = new web3.eth.Contract(abi, deployedAddress) 
+  let amount = web3.utils.toWei(amu, "ether");  
+
+  const transaction = contract.methods.transfer(toAddress, amount); 
+  const gasPrice= await web3.eth.getGasPrice() 
+
+  const gas = await transaction.estimateGas({
+    from: address
+  }); 
+  const nonce = await web3.eth.getTransactionCount(address); 
+  const data = transaction.encodeABI(); 
+
   const tx = {
-    from: signer.address,
-    to: tokenAddress, // deployed token address
-    data: contract.methods.transfer(toAddress, amount).encodeABI(),
-    gas: web3.utils.toHex(5000000),
-    gasPrice: web3.utils.toHex(gasPrice),
-    nonce: web3.utils.toHex(nonce),
-  };
+    from: address,
+    to: deployedAddress,
+    data,
+    gas,
+    gasPrice,
+    nonce,  
+  }; 
 
-  const signedTx = await web3.eth.accounts.signTransaction(
-    tx,
-    signer.privateKey
-  );
-  console.log("Raw transaction data: " + signedTx.rawTransaction);
+  const signedTx = await web3.eth.accounts.signTransaction(tx, privateKey) 
+ 
+  const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction)
+     
+  console.log(`receipt`, receipt) 
+  return { value: receipt.transactionHash, from: receipt.from,to: toAddress }
 
-  // Sending the transaction to the network
-  const receipt = await web3.eth
-    .sendSignedTransaction(signedTx.rawTransaction)
-    .once("transactionHash", (txhash) => {
-      console.log(`Mining transaction ...`);
-      console.log(txhash);
-    });
-  // The transaction is now on chain!
-  console.log(`Mined in block ${receipt.blockNumber}`);
 };
 
-setTimeout(() => {
-  sendToken(abi);
-}, 2000);
+
+ 
+
+

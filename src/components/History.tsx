@@ -1,6 +1,6 @@
 import React from 'react'
 
-const History = ({ transactionHistory }) => {
+const History = ({ transactionHistory, value }) => {
   return (
     <div>
       {transactionHistory.length > 0 && (
@@ -15,8 +15,8 @@ const History = ({ transactionHistory }) => {
                   <span className="text-gray-500 text-[14px]">
                     <b>Reciever</b> : {item.to}
                   </span>
-                  <span className="text-gray-500 text-[14px]">
-                    <b>Amount Send </b> : {item.value}
+                  <span className="text-gray-500 text-[14px] cursor-pointer w-[450px] whitespace-nowrap overflow-hidden overflow-ellipsis">
+                    <b>{value} </b> : {item.value}
                   </span>
                   <span className="text-gray-500 text-[14px]">
                     <b>Status</b> :{" "}
