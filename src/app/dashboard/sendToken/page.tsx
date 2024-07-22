@@ -3,12 +3,13 @@
 import BackButton from "@/components/BackButton";
 import Button from "@/components/Button";
 import Error from "@/components/Error";
+import Loader from "@/components/Loader";
 import { abi } from "@/utils/abi";
 import { sendToken, web3 } from "@/utils/walletUtilities";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import Image from "next/image";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import React, { useState } from "react";
 
 
@@ -16,49 +17,65 @@ const privateKey = localStorage.getItem("privateKey");
 const address = localStorage.getItem("address");
 const password = localStorage.getItem("password");
 const page = () => {
+  const router= useRouter()
   const tokenTxHistory = JSON.parse(localStorage.getItem("tokenTxHistory")) || [];
   const searchParams = useSearchParams();
   const [sendTokenAddress,setSendTokenAddress]=useState("")
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const [amount, setAmount] = useState(0);
   const [enteredPass, setEnteredPass] = useState('');
 
   const name = searchParams.get("name");
-  const totalSupply = searchParams.get("totalSupply");
+  const balance = searchParams.get("balance");
   const deployedAddress = searchParams.get("deployedAddress");
-  console.log("deployedAddress: " + deployedAddress)
+  console.log("loading: " + loading)
 
 
 
+ 
+  const handleSendToken = () => {
+     setLoading(true);
+     setError("");
 
-  const handleSendToken= async()=>{
-    if (password != enteredPass) {
-      setError("Incorrect password");
-      return;
-    }
-    if (!(web3.utils.isAddress(sendTokenAddress))){
-      setError("Invalid reciever address")
-      return;
-    }
-
-
-
-      try {
-        const res = await sendToken(
-          abi,
-          address,
-          `0x${privateKey}`,
-          deployedAddress,
-          sendTokenAddress,
-          amount
-        );
-        console.log("res", res);
-        tokenTxHistory.push(res);
-        localStorage.setItem("tokenTxHistory", JSON.stringify(tokenTxHistory));
-      } catch (error) {
-        console.log(error);
-      }
-  }
+    (async function (){
+       if (password != enteredPass) {
+         setLoading(false);
+         setError("Incorrect password");
+         return;
+       }
+       if (!web3.utils.isAddress(sendTokenAddress)) {
+         setLoading(false);
+         setError("Invalid reciever address");
+         return;
+       }
+       if (balance < amount) {
+         setLoading(false);
+         setError("Not enough funds to send token");
+         return;
+       }
+       try {
+         const res = await sendToken(
+           abi,
+           address,
+           `0x${privateKey}`,
+           deployedAddress,
+           sendTokenAddress,
+           amount
+         );
+         console.log("res", res);
+         tokenTxHistory.push(res);
+         localStorage.setItem("tokenTxHistory", JSON.stringify(tokenTxHistory));
+          
+         router.push("transactionSuccessfull");
+       } catch (error) {
+         console.log(error);
+       }
+     })();
+    
+   };
+  
+ 
 
   return (
     <div className="container relative ">
@@ -138,6 +155,7 @@ const page = () => {
           </form>
         </div>
       </div>
+      {loading && <Loader />}
     </div>
   );
 };

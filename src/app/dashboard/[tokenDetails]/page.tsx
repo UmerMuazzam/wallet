@@ -17,7 +17,7 @@ const page = () => {
 
   const handleSendNavigate = () => {
     router.push(
-      `sendToken?totalSupply=${detail?.totalSupply}&name=${detail?.name}&deployedAddress=${detail?.deployedAddress}`
+      `sendToken?balance=${detail?.balance}&name=${detail?.name}&deployedAddress=${detail?.deployedAddress}`
     );
   };
 
