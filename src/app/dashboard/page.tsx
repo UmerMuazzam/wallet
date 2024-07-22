@@ -1,6 +1,6 @@
 "use client";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
- 
+
 import { getDetails } from "@/utils/walletUtilities";
 import Image from "next/image";
 import Link from "next/link";
@@ -22,9 +22,9 @@ const page = () => {
   const [accBallance, setAccBallance] = useState("");
   const router = useRouter();
 
-  const handleLogout = (e) => { 
-    setLoading(true)
-    setTimeout(() => { 
+  const handleLogout = (e) => {
+    setLoading(true);
+    setTimeout(() => {
       localStorage.removeItem("password");
       router.push(`/`);
     }, 1000);
@@ -37,22 +37,22 @@ const page = () => {
   };
 
   const handleSendTransaction = () => {
-    setLoading(true)
+    setLoading(true);
     setTimeout(() => {
       router.push(`/dashboard/transaction?ballance=${accBallance}`);
     }, 1000);
   };
   const handleRecieve = () => {
-      setLoading(true);
-      setTimeout(() => { 
-        router.push(`/dashboard/receive?address=${accAddress}`);
-      }, 1000);
+    setLoading(true);
+    setTimeout(() => {
+      router.push(`/dashboard/receive?address=${accAddress}`);
+    }, 1000);
   };
 
-  const handleShowHistory=()=>{
-    setShowHistory(true)
-    setShowTokens(false)
-  }
+  const handleShowHistory = () => {
+    setShowHistory(true);
+    setShowTokens(false);
+  };
   const handleShowTokens = () => {
     setShowHistory(false);
     setShowTokens(true);
@@ -148,13 +148,18 @@ const page = () => {
 
         <div className="flex justify-between">
           <h2
-            className="text-[18px] font-semibold mt-6 inline-block cursor-pointer"
+            className="text-[16px] font-semibold mt-6 inline-block cursor-pointer"
             onClick={handleShowHistory}
           >
             History
           </h2>
+          <Link href="/dashboard/sendTokenDetails">
+            <h2 className="text-[16px] font-semibold mt-6 inline-block cursor-pointer">
+              Token Activity
+            </h2>
+          </Link>
           <h2
-            className="text-[18px] font-semibold mt-6 cursor-pointer"
+            className="text-[16px] font-semibold mt-6 cursor-pointer"
             onClick={handleShowTokens}
           >
             Tokens{" "}

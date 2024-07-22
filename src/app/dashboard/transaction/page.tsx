@@ -6,11 +6,10 @@ import Error from "@/components/Error";
 import Loader from "@/components/Loader";
 import Logo from "@/components/Logo";
 import { decryptMnemonics, transferEther } from "@/utils/walletUtilities";
-import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useState } from "react";
 
-const privateKey= localStorage.getItem("privateKey");
+const privateKey = localStorage.getItem("privateKey");
 
 const page = () => {
   const [sendTo, setSendTo] = useState(false);
@@ -43,7 +42,6 @@ const page = () => {
         return;
       }
 
-     
       // calling transfer ether function
       const transfer = await transferEther(
         myAdd,
@@ -56,7 +54,7 @@ const page = () => {
         setSendTo(transfer.message);
         return;
       }
-      setLoading(true)
+      setLoading(true);
       setTimeout(() => {
         router.push("/dashboard/transactionSuccessfull");
       }, 1000);
@@ -68,7 +66,7 @@ const page = () => {
 
   return (
     <div className="container relative text-center">
-      <BackButton link="/dashboard"/> 
+      <BackButton link="/dashboard" />
       <div>
         <Logo />
         <h3 className="text-[18px] font-semibold my-8">
@@ -122,7 +120,6 @@ const page = () => {
               placeholder="Please Enter amount to send"
               id="amount"
               name="amount"
-              required
             />
           </span>
           {amount >= balance && (
