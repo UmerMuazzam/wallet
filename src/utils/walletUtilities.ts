@@ -18,7 +18,7 @@ export const generateMnemonics = (password) => {
 
 // function creating account from mnemonics
 export const createAccount = async (mns) => {
-  localStorage.setItem("transactionHistory", JSON.stringify([]));
+  // localStorage.setItem("transactionHistory", JSON.stringify([]));
   console.log("mnemonics", mns);
   const seed = await bip39.mnemonicToSeed(mns);
   const node = bip32.fromSeed(seed);
@@ -94,7 +94,7 @@ export const getDetails = async () => {
 // sending transaction to an account or address
 export const transferEther = async (sendFrom, sendTo, amount, privateKey) => {
   console.log("privateKey", privateKey);
-  const transactionHistoryString = localStorage.getItem("transactionHistory");
+  const transactionHistoryString = localStorage.getItem("transactionHistory") || [];
   const transactionHistory = JSON.parse(transactionHistoryString);
   const res = web3.utils.isAddress(sendTo);
 
