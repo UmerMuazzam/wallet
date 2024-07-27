@@ -230,13 +230,10 @@ export const getNFTContract=async()=>{
   try {
     const myContract = new web3.eth.Contract(tokenURIABI, tokenContract);
     const tokenURI = await myContract.methods.tokenURI(tokenId).call()
-    console.log(object)
+    console.log("tokenURI", tokenURI)
     const name = await myContract.methods.name().call();
     const symbol = await myContract.methods.symbol().call();
-    const totalSupply = web3.utils.fromWei(
-      await myContract.methods.totalSupply().call(),
-      "ether"
-    );
+    
     const balance = web3.utils.fromWei(await myContract.methods.balanceOf(address).call(), 'ether')
 
     return { name, symbol, totalSupply, deployedAddress, balance };
