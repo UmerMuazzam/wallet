@@ -3,6 +3,7 @@ import React from 'react'
 const History = ({ transactionHistory, value }) => {
   return (
     <div>
+      <h3 className='font-bold text-center text-[18px] mt-6'>History</h3>
       {transactionHistory.length > 0 && (
         <div className="">
           {transactionHistory?.map((item, i) => {

@@ -7,12 +7,15 @@ import Error from "./Error";
 import TokensList from "./TokensList";
 import Link from "next/link";
 import Loader from "./Loader";
+import History from "./History";
 
 const address = localStorage.getItem("address");
 console.log("address", address);
 
 const Tokens = () => {
   const [contractDetails, setContractDetails] = useState([]);
+  const transactionHistory =
+    JSON.parse(localStorage.getItem("tokenTxHistory")) || [];
 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -89,10 +92,10 @@ const Tokens = () => {
             value={tokenAddress}
             onChange={(e) => setTokenAddress(e.target.value)}
             type="text"
-            className=" outline-none border bg-white rounded-md px-3 py-1"
+            className=" px-3 py-2 bg-white w-[100%] rounded-lg placeholder:text-blue-950 outline-none "
           />
           <button
-            className="text-blue font-semibold border w-24 p-1 m-auto bg-white rounded-md"
+            className=" bg-blue text-[16px] font-normal text-white w-[240px] mx-auto mt-4 mb-4  h-[40px] rounded-lg shadow-lg  hover:animate-pulse"
             onClick={handleTokenAddress}
           >
             Next
@@ -102,6 +105,11 @@ const Tokens = () => {
       )}
 
       <TokensList contractDetails={contractDetails} />
+
+      <History
+        value="Transaction Hash"
+        transactionHistory={transactionHistory}
+      />
 
       {loading && <Loader />}
     </div>

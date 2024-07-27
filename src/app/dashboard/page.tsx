@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import Loader from "@/components/Loader";
 import History from "@/components/History";
 import Tokens from "@/components/Tokens";
+import BasicTabs from "@/components/DashboardTabs";
 
 const page = () => {
   const isLogin = localStorage.getItem("password") || false;
@@ -146,32 +147,10 @@ const page = () => {
           </div>
         </div>
 
-        <div className="flex justify-between">
-          <h2
-            className="text-[16px] font-semibold mt-6 inline-block cursor-pointer"
-            onClick={handleShowHistory}
-          >
-            History
-          </h2>
-          <Link href="/dashboard/sendTokenDetails">
-            <h2 className="text-[16px] font-semibold mt-6 inline-block cursor-pointer">
-              Token Activity
-            </h2>
-          </Link>
-          <h2
-            className="text-[16px] font-semibold mt-6 cursor-pointer"
-            onClick={handleShowTokens}
-          >
-            Tokens{" "}
-          </h2>
-        </div>
-        {showHistory && (
-          <History
-            value="Amount Send"
-            transactionHistory={transactionHistory}
-          />
-        )}
-        {showTokens && <Tokens />}
+        <BasicTabs
+          myValue="Amount Send"
+          transactionHistory={transactionHistory}
+        />
       </div>
       {loading && <Loader />}
     </div>

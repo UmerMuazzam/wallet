@@ -13,7 +13,7 @@ const page = () => {
 
   return (
     <div className="container relative ">
-      <div className="flex  justify-between rounded-t-md items-center  m-auto p-4 bg-slate-50">
+      <div className="flex shadow-lg justify-between rounded-t-md items-center  m-auto p-4 bg-slate-50">
         <Link href="/">
           <Image src="/creata.svg" height={34} width={34} alt="Creata logo" />
         </Link>
@@ -54,7 +54,7 @@ const page = () => {
         </Menu>
       </div>
       <div className=" mx-auto h-[2px]  bg-white"></div>
-      <div className=" relative bg-slate-50 py-16 pl-16">
+      <div className=" relative shadow-lg bg-slate-50 py-16 pl-16">
         <BackButton link={"/dashboard"}>Back</BackButton>
 
         <History value="Transaction Hash" transactionHistory={transactionHistory} />
