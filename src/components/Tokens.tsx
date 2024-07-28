@@ -10,7 +10,6 @@ import Loader from "./Loader";
 import History from "./History";
 
 const address = localStorage.getItem("address");
-console.log("address", address);
 
 const Tokens = () => {
   const [contractDetails, setContractDetails] = useState([]);
