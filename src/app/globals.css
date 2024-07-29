@@ -2,12 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
-body{
-    background: linear-gradient(#f1f3f6, #deebff);
-    min-height: 100vh;
+body {
+  background: linear-gradient(#f1f3f6, #deebff);
+  min-height: 100vh;
 }
-.container{
-    max-width: 640px;
-    margin: auto;
-    padding: 1rem; 
+.container {
+  max-width: 900px;
+  margin: auto;
+  padding: 1rem;
 }
