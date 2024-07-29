@@ -8,6 +8,12 @@ const nextConfig = {
         port: "",
         pathname: "/account123/**",
       },
+      {
+        protocol: "https",
+        hostname: "fuchsia-faithful-warbler-547.mypinata.cloud",
+        port: "",
+        pathname: "/ipfs/**",
+      },
     ],
   },
 };

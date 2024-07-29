@@ -1,13 +1,19 @@
+import React from 'react'
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+import { useRouter } from 'next/navigation';
 
-const TokensList = ({ contractDetails }) => {
+const NFTList = ({ contractDetails }) => {
+   const router = useRouter();
   return (
     <>
       {contractDetails?.map((item, i) => (
-        <Link
-          href={`/dashboard/${item.deployedAddress}`}
+        <div
+          onClick={() =>
+            router.push(
+              `/dashboard/nftDetails?address=${item.deployedAddress}&tokenId=${item.tokenId}`
+            )
+          }
           key={i}
           className="flex gap-4 items-center text-[14px] font-semibold cursor-pointer"
         >
@@ -24,10 +30,10 @@ const TokensList = ({ contractDetails }) => {
             <div>{item?.name}</div>
             <div className="text-blue">{item?.symbol} </div>
           </div>
-        </Link>
+        </div>
       ))}
     </>
   );
 };
 
-export default TokensList;
+export default NFTList

@@ -5,6 +5,15 @@ again = 0x6096cB55a2691a74f4f33cE3592bcf07bec9F534
 uri= https://coral-mad-otter-869.mypinata.cloud/ipfs/QmXkB7prXM4Mwx5P4vMyPNWscJP8i8pUEdjbytahXLFVQu
 
 
+new uri = https://fuchsia-faithful-warbler-547.mypinata.cloud/ipfs/QmUd6yNdCZV4r5DiGGhRupzzKSCmDDDDy6oeHkyjcQcENT
+
+tokennft= 0x0F77B28F9E46178d42A75bC7A8c39075d190BD6C
+
+
+tokenId = 6
+uri 2 = https://fuchsia-faithful-warbler-547.mypinata.cloud/ipfs/QmUd6yNdCZV4r5DiGGhRupzzKSCmDDDDy6oeHkyjcQcENT
+
+
 
 [
 	{

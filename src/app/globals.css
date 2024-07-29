@@ -7,7 +7,7 @@ body {
   min-height: 100vh;
 }
 .container {
-  max-width: 900px;
+  max-width: 600px;
   margin: auto;
   padding: 1rem;
 }
