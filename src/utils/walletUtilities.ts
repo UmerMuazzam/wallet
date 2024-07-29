@@ -217,12 +217,15 @@ export const sendToken = async (
 
 // get nft import
 
-
 const pinataGatway =
   "https://fuchsia-faithful-warbler-547.mypinata.cloud/ipfs/";
 
-export const getNFTContract = async (tokenURIABI, tokenContract, tokenId, address) => {
-
+export const getNFTContract = async (
+  tokenURIABI,
+  tokenContract,
+  tokenId,
+  address
+) => {
   try {
     const myContract = new web3.eth.Contract(tokenURIABI, tokenContract);
 
@@ -234,33 +237,83 @@ export const getNFTContract = async (tokenURIABI, tokenContract, tokenId, addres
     const name = await myContract.methods.name().call();
     const symbol = await myContract.methods.symbol().call();
 
-    const nftTokenDetails = JSON.parse(localStorage.getItem("nftTokenDetails")) || {};
+    const nftTokenDetails =
+      JSON.parse(localStorage.getItem("nftTokenDetails")) || {};
 
     if (!nftTokenDetails[address]) {
       nftTokenDetails[address] = [];
     }
 
-    if (nftTokenDetails[address].find((item) => item.deployedAddress === tokenContract && item.tokenId === tokenId)) {
+    if (
+      nftTokenDetails[address].find(
+        (item) =>
+          item.deployedAddress === tokenContract && item.tokenId === tokenId
+      )
+    ) {
       return { ok: true, allready: true };
     }
 
-    nftTokenDetails[address].push({ ok: true, pinataImage, name, symbol, deployedAddress: tokenContract, tokenId, jsonData });
+    nftTokenDetails[address].push({
+      ok: true,
+      pinataImage,
+      name,
+      symbol,
+      deployedAddress: tokenContract,
+      tokenId,
+      jsonData,
+    });
 
     localStorage.setItem("nftTokenDetails", JSON.stringify(nftTokenDetails));
     console.log("nftTokenDetails", nftTokenDetails);
-    return { ok: true, pinataImage, name, symbol, deployedAddress: tokenContract, tokenId };
+    return {
+      ok: true,
+      pinataImage,
+      name,
+      symbol,
+      deployedAddress: tokenContract,
+      tokenId,
+    };
   } catch (error) {
     return { ok: false, error: " Contract address or ID is incorrect" };
   }
 };
 
+// function to transfer nft
 
+export const transferNFT = async (
+  privateKey,
+  address,
+  sendTo,
+  tokenAddress,
+  tokenId,
+  tokenURIABI
+) => {
+  // console.log("privateKey, address,sendTo, tokenAddress,  tokenId,  tokenURIABI", privateKey, address,sendTo,tokenAddress,tokenId, tokenURIABI)
 
+  const contract = new web3.eth.Contract(tokenURIABI, tokenAddress);
+  console.log("contract ", contract);
 
+  const tx = {
+    from: address,
+    to: tokenAddress,
+    gas: 2000000, // Adjust gas limit as needed
+    data: contract.methods
+      .safeTransferFrom(address, sendTo, tokenId)
+      .encodeABI(),
+  };
+  console.log("tx", tx);
 
-// function to transfer nft 
+  // Sign the transaction
+  const signedTx = await web3.eth.accounts.signTransaction(tx, privateKey);
+  console.log("signedTx", signedTx);
 
-export const transferNFT = async (privateKey, address, sendTo, tokenAddress, tokenId, tokenURIABI) => {
-  console.log("privateKey, address,sendTo, tokenAddress,  tokenId,  tokenURIABI", privateKey, address,sendTo,tokenAddress,tokenId, tokenURIABI)
-
-}
+  // Send the transaction
+  web3.eth
+    .sendSignedTransaction(signedTx.rawTransaction)
+    .on("receipt", (receipt) => {
+      console.log("Transaction receipt:", receipt);
+    })
+    .on("error", (error) => {
+      console.error("Error:", error);
+    });
+};
