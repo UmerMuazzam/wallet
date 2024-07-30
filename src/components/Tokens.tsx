@@ -9,9 +9,9 @@ import Link from "next/link";
 import Loader from "./Loader";
 import History from "./History";
 
-const address = localStorage.getItem("address");
 
 const Tokens = () => {
+  const address = localStorage.getItem("address");
   const [contractDetails, setContractDetails] = useState([]);
   const transactionHistory =
     JSON.parse(localStorage.getItem("tokenTxHistory")) || [];

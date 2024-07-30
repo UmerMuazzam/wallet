@@ -1,25 +1,29 @@
 "use client";
 
 import BackButton from "@/components/BackButton";
+import { checkOwnerOfToken, getNftDetails } from "@/utils/walletUtilities";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import Image from "next/image";
 import Link from "next/link";
-import {  useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 const address = localStorage.getItem("address");
-const getAccountNFTS =JSON.parse(localStorage.getItem("nftTokenDetails"))[address] || [];
-
 const page = () => {
   const router = useRouter();
-    const searchParams = useSearchParams();
-     const address = searchParams.get("address");
-     const tokenId = searchParams.get("tokenId");
-
-    const data=  getAccountNFTS.find(
-       (item) => item.tokenId === tokenId && item.deployedAddress === address
-     );
-     console.log("data",data);
+  const searchParams = useSearchParams();
+  const deployedAddress = searchParams.get("address");
+  const tokenId = searchParams.get("tokenId");
+  const [data, setData] = useState({});
+ 
+  async function getData() {
+    const data = await getNftDetails(deployedAddress, tokenId, address);
+    console.log("data", data);
+    setData(data);
+  }
+  useEffect(() => {
+    getData();
+  }, []);
 
   return (
     <div className="container relative ">
@@ -69,8 +73,16 @@ const page = () => {
         <BackButton link={"/dashboard"}>Back</BackButton>
 
         <div className=" text-[14px] pt-2 px-4">
-          <b>Token Address :</b> {data.deployedAddress}{" "}
+          <b>Token Address :</b> {data?.deployedAddress}{" "}
         </div>
+
+        {!data.owner ? (
+          <div className="text-xl font-bold uppercase text-center mt-4 bg-blue text-white">
+            You previously owned
+          </div>
+        ) : (
+          ""
+        )}
 
         <Image
           className="mt-12 mx-auto rounded-lg"
@@ -81,29 +93,34 @@ const page = () => {
         />
         <div className="ml-[184px] mt-2 text-[17px] font-bold text-gray-500">
           {" "}
-          id # {data.tokenId}
+          id # {data?.tokenId}
         </div>
 
         <div className="flex flex-col pt-6 items-center gap-4">
           <div className="text-xl font-semibold">
             {" "}
-            {data.name} {data.symbol}
+            {data?.name} {data?.symbol}
           </div>
 
-          <Image
-            onClick={() =>
-              router.push(
-                `/dashboard/nftDetails/send?tokenAddress=${address}&tokenId=${tokenId}`
-              )
-            }
-            className="bg-blue rounded-full p-3 shadow-xl cursor-pointer  "
-            src="/send.svg"
-            alt="Send"
-            height={64}
-            width={64}
-          />
-
-          <span className="font-semibold text-[14px]">Send</span>
+          {data.owner ? (
+            <div>
+              <Image
+                onClick={() =>
+                  router.push(
+                    `/dashboard/nftDetails/send?tokenAddress=${deployedAddress}&tokenId=${tokenId}`
+                  )
+                }
+                className="bg-blue rounded-full p-3 shadow-xl cursor-pointer  "
+                src="/send.svg"
+                alt="Send"
+                height={64}
+                width={64}
+              />
+              <span className="font-semibold text-[14px]">Send</span>
+            </div>
+          ) : (
+            ""
+          )}
         </div>
       </div>
     </div>
