@@ -3,6 +3,7 @@ import * as bip32 from "bip32";
 import { Web3 } from "web3";
 import * as pbkdf2 from "pbkdf2-sha256";
 import * as aes from "aes-js";
+import { tokenURIABI } from "./nftABI";
 
 // initiating web 3 wallet
 export const web3 = new Web3("https://80002.rpc.thirdweb.com/");
@@ -215,52 +216,100 @@ export const sendToken = async (
   return { value: receipt.transactionHash, from: receipt.from, to: toAddress };
 };
 
-// get nft import
 
 
-const pinataGatway =
-  "https://fuchsia-faithful-warbler-547.mypinata.cloud/ipfs/";
+// ************************************IMPORT NFT TOKEN***************************************************
+ 
 
-export const getNFTContract = async (tokenURIABI, tokenContract, tokenId, address) => {
+export const getNFTContract = async ( deployedAddress, tokenId, address) => {
 
   try {
-    const myContract = new web3.eth.Contract(tokenURIABI, tokenContract);
+    const myContract = new web3.eth.Contract(tokenURIABI, deployedAddress);
+    // checking weather he is the owner of the token
+    const ownerOf = await myContract.methods.ownerOf(tokenId).call();
+    console.log('ownerOf', ownerOf);
+    if (ownerOf!== address) {
+      return { ok: false, message: "This NFT is not yours" };
+    } 
 
-    const tokenURI = await myContract.methods.tokenURI(tokenId).call();
-
-    const response = await fetch(tokenURI);
-    const jsonData = await response.json();
-    const pinataImage = jsonData.image;
-    const name = await myContract.methods.name().call();
-    const symbol = await myContract.methods.symbol().call();
-
+    // geting nftTokenDetails object from localStorage
     const nftTokenDetails = JSON.parse(localStorage.getItem("nftTokenDetails")) || {};
 
     if (!nftTokenDetails[address]) {
       nftTokenDetails[address] = [];
     }
-
-    if (nftTokenDetails[address].find((item) => item.deployedAddress === tokenContract && item.tokenId === tokenId)) {
-      return { ok: true, allready: true };
+    // check if token already imported
+    if (nftTokenDetails[address].find((item) => item.deployedAddress === deployedAddress && item.tokenId === tokenId)) {
+      return { ok: false, message: 'Token all ready imported' };
     }
-
-    nftTokenDetails[address].push({ ok: true, pinataImage, name, symbol, deployedAddress: tokenContract, tokenId, jsonData });
-
+    // pushing new token data into array 
+    nftTokenDetails[address].push({ ownerOf: true, deployedAddress, tokenId });
     localStorage.setItem("nftTokenDetails", JSON.stringify(nftTokenDetails));
     console.log("nftTokenDetails", nftTokenDetails);
-    return { ok: true, pinataImage, name, symbol, deployedAddress: tokenContract, tokenId };
+    return { ok: true,message:'Token Imported successfuly' };
   } catch (error) {
-    return { ok: false, error: " Contract address or ID is incorrect" };
+    return { ok: false, message: " Contract address or ID is incorrect" };
   }
 };
 
 
+// CHECK OWNER OF NFT TOKEN 
+export const checkOwnerOfToken = async (address, deployedAddress, tokenId)=>{
+  const myContract = new web3.eth.Contract(tokenURIABI, deployedAddress);
+  const ownerOf = await myContract.methods.ownerOf(tokenId).call();
+  console.log('ownerOf', ownerOf);
+  if (ownerOf !== address) {
+    return { ok: false, message: "This NFT is not yours" };
+  }
+}
+
+// function to get nft details 
+
+export const getNftDetails = async (deployedAddress, tokenId, address)=>{
+  try {
+    const myContract = new web3.eth.Contract(tokenURIABI, deployedAddress);
+    const ownerOf = await myContract.methods.ownerOf(tokenId).call();
+    let owner=true;
+    if (ownerOf !== address) {
+      owner=false
+    }
+    const tokenURI = await myContract.methods.tokenURI(tokenId).call();
+    const response = await fetch(tokenURI);
+    const jsonData = await response.json();
+    const pinataImage = jsonData.image;
+    const name = await myContract.methods.name().call();
+    const symbol = await myContract.methods.symbol().call();
+    return { ok: true, pinataImage, name, symbol, deployedAddress, tokenId, jsonData, owner }
+  } catch (error) {
+    return { ok: false, message: "Fetching token details failed", error}
+  }
+}
 
 
 
-// function to transfer nft 
+
+
+// function to transfer nft  
 
 export const transferNFT = async (privateKey, address, sendTo, tokenAddress, tokenId, tokenURIABI) => {
-  console.log("privateKey, address,sendTo, tokenAddress,  tokenId,  tokenURIABI", privateKey, address,sendTo,tokenAddress,tokenId, tokenURIABI)
+  try {
+    const contract = new web3.eth.Contract(tokenURIABI, tokenAddress);
+    const tx = {
+      from: address,
+      to: tokenAddress,
+      gas: 2000000, // Adjust gas limit as needed
+      data: contract.methods.safeTransferFrom(address, sendTo, tokenId).encodeABI(),
+      gasPrice: await web3.eth.getGasPrice()
 
-}
+    };
+    const signedTx = await web3.eth.accounts.signTransaction(tx, privateKey);
+    
+    const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction)       
+        console.log("Transaction receipt:", receipt);
+        
+        return { ok: true, message: "NFT successfully transferred" };
+  } catch (error) {
+      console.error("Error while transferring NFT:", error);
+      return { ok: false, message: "Failed to transfer NFT by EVM" };
+  }
+};

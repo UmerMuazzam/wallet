@@ -5,7 +5,7 @@ import Button from "@/components/Button";
 import Error from "@/components/Error";
 import Loader from "@/components/Loader"; 
 import { tokenURIABI } from "@/utils/nftABI";
-import { transferNFT } from "@/utils/walletUtilities";
+import { transferNFT, web3 } from "@/utils/walletUtilities";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import Image from "next/image";
 import Link from "next/link";
@@ -26,23 +26,40 @@ const page = () => {
   const tokenId = searchParams.get("tokenId");
 
   const handleForm = async (event) => {
+    setError("")
+    setLoading(true)
     event.preventDefault();
     const sendTo = event.target.sendTo.value;
     const enteredPassword = event.target.password.value; 
     if(password !== enteredPassword) 
     { 
         setError("Wrong password")
+        setLoading(false);setLoading(false);
         return;
     }
+    const isValidAddress = web3.utils.isAddress(sendTo);
+    if (!isValidAddress) {
+      setError("Invalid reciever address");
+      setLoading(false);
+      return;
+    }
     
-      transferNFT(
-      privateKey,
-      address,
-      sendTo,
-      tokenAddress,
-      tokenId,
-      tokenURIABI
-    );
+     const response = await transferNFT(
+        privateKey,
+        address,
+        sendTo,
+        tokenAddress,
+        tokenId,
+        tokenURIABI
+      );
+     setLoading(false);
+
+     if(response.ok){
+       router.push("/dashboard/transactionSuccessfull");
+     }
+     else{
+       setError(response.message)
+     }
 
   }
 

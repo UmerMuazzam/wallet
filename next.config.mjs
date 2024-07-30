@@ -10,10 +10,12 @@ const nextConfig = {
       },
       {
         protocol: "https",
-        hostname: "fuchsia-faithful-warbler-547.mypinata.cloud",
+        hostname: "",
         port: "",
         pathname: "/ipfs/**",
       },
+      
+       
     ],
   },
 };

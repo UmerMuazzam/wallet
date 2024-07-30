@@ -1,10 +1,10 @@
-import { tokenURIABI } from '@/utils/nftABI';
-import { getNFTContract } from '@/utils/walletUtilities';
+"use client"
+
+import { getNFTContract, getNftDetails } from '@/utils/walletUtilities';
 import React, { useEffect, useState } from 'react' 
 import Error from './Error';
 import { useRouter } from 'next/navigation';
 import Loader from './Loader';
-import TokensList from './TokensList';
 import NFTList from './NFTList';
 
 
@@ -17,46 +17,59 @@ const ImportNFT = () => {
     ];
   } 
   const [error,setError]=useState("")
+  const [nftTokenList, setNftTokenList] = useState([]);
   const [loader, setLoader] = useState(false);
   const router= useRouter()
+
+  const handleGetNftTokenDetails = async() => {
+    const getTokensDetails = contractDetails.map((item) =>
+      getNftDetails(item.deployedAddress, item.tokenId, address)
+    );
+    const promise = await Promise.all(getTokensDetails);
+    return  promise
+  };
 
 const handleForm =async(event) => {
   event.preventDefault(); 
   setLoader(true)
-
   const tokenAddress = event.target.tokenAddress.value;
   const tokenId = event.target.tokenId.value;
- 
+
   if (!tokenAddress.length || !tokenId.length){
     setError("Please fill both fields")
     setLoader(false)
+    event.target.tokenAddress.value="";
+    event.target.tokenId.value = "";
     return;
   }
     const response = await getNFTContract(
-      tokenURIABI,
       tokenAddress,
       tokenId,
       address
     );
   if(!response.ok){
-    setError(response.error)
-    setLoader(false)
-  }
-  else if(response.allready){
-    setError("Token already imported")
+    setError(response.message)
     setLoader(false)
   }
   else{
     setLoader(false);
-    router.push('/dashboard')
+    // router.push('/dashboard')
     setError("")
   }
-
-
+  event.target.tokenAddress.value = "";
+  event.target.tokenId.value = "";
 };
 
-// useEffect(() => {}, [loader]);
+const callAsync=async()=>{
+  const res= await handleGetNftTokenDetails()
+   console.log("handleGetNftTokenDetails", res)
+   setNftTokenList(res) 
+}
 
+useEffect(() => {
+  callAsync();
+},[] );
+ 
     
   return (
     <div className="container relative text-center">
@@ -97,7 +110,7 @@ const handleForm =async(event) => {
         </div>
       )}
 
-      <NFTList contractDetails={contractDetails} />
+      <NFTList contractDetails={nftTokenList} />
     </div>
   );
 }
